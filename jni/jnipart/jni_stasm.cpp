@@ -5,14 +5,18 @@
 
 extern "C" {
 	JNIEXPORT jintArray JNICALL Java_com_tuwien_snowwhite_MainActivity_FindFaceLandmarks(
-		JNIEnv* env, jobject, jfloat ratioW, jfloat ratioH) 
+		JNIEnv* env, jobject, jfloat ratioW, jfloat ratioH, jstring jpath)
 	{
 		clock_t StartTime = clock();
 		jintArray arr = env->NewIntArray(2*stasm_NLANDMARKS);
 		jint *out = env->GetIntArrayElements(arr, NULL);
-	
-		static const char* path = "/data/data/com.tuwien.snowwhite/app_stasmdata/face.jpg";
-  		cv::Mat_<unsigned char> img(cv::imread(path, CV_LOAD_IMAGE_GRAYSCALE));
+
+		static const char * path;
+		path = env->GetStringUTFChars( jpath , NULL ) ;
+		__android_log_print(ANDROID_LOG_ERROR, "MYPATH________", "==%s",path);
+		//static const char* path = "/data/data/com.tuwien.snowwhite/app_stasmdata/face.jpg";
+		cv::Mat_<unsigned char> img(cv::imread(path, CV_LOAD_IMAGE_GRAYSCALE));
+
 
     	if (!img.data) 
     	{
@@ -40,7 +44,11 @@ extern "C" {
 
    		if (!foundface) 
    		{
-   			__android_log_print(ANDROID_LOG_ERROR, "StasmAndroidDemo", "No face found in %s", path);
+   			__android_log_print(ANDROID_LOG_ERROR, "StasmAndroidDemo", "no face found");
+   			//for( int i = 0 ; i < 500 ; i ++ ){
+   			//	__android_log_print(ANDROID_LOG_ERROR, "luky", "SCHAUDO:%c",data[i]);
+   			//	}
+
    			out[0] = -3;
     		out[1] = -3;
     		img.release();

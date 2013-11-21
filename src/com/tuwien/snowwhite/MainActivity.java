@@ -3,7 +3,9 @@ package com.tuwien.snowwhite;
 
 import android.app.Activity;
 import android.os.Bundle; 
+
 import java.io.*;
+import java.nio.ByteBuffer;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
@@ -17,6 +19,7 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.content.Context;
+import android.content.Intent;
 import android.view.Display;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -42,8 +45,10 @@ public class MainActivity extends Activity {
   	private File f_testface = null;
   	private float ratioW = 0;
   	private float ratioH = 0;
+  	
+  	private String imgPath = "";
   		
-    public native int[] FindFaceLandmarks(float ratioW, float ratioH);
+    public native int[] FindFaceLandmarks(float ratioW, float ratioH, String path);
     
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -116,6 +121,11 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		setTitle("Stasm Android Demo by Dr. Furkan");
 		
+		//GET IMG FILE
+		Intent intent = getIntent();
+		imgPath = intent.getStringExtra("imgFile");
+		Toast.makeText(MainActivity.this, "MYFILE: "+imgPath, Toast.LENGTH_LONG).show();
+		
 		Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay(); 
 		int ori = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getOrientation();
 		screenWW = display.getWidth();
@@ -127,8 +137,8 @@ public class MainActivity extends Activity {
         	putDataFileInLocalDir(MainActivity.this, R.raw.haarcascade_mcs_lefteye, f_lefteye);
         	putDataFileInLocalDir(MainActivity.this, R.raw.haarcascade_mcs_righteye, f_righteye);
         	
-        	f_testface = new File(dataDir, "face.jpg");
-        	putDataFileInLocalDir(MainActivity.this, R.drawable.face, f_testface);
+        	//f_testface = new File(dataDir, "face.jpg");
+        	//putDataFileInLocalDir(MainActivity.this, R.drawable.face, f_testface);
         }
         
         sv = (SampleView) findViewById(R.id.sv);
@@ -152,8 +162,9 @@ public class MainActivity extends Activity {
 			public void run() {
 				Looper.prepare(); 
 				
-				if (mImage != null) {					
-					int[] points = FindFaceLandmarks(ratioW, ratioH);
+				if (mImage != null) {				
+					
+					int[] points = FindFaceLandmarks(ratioW, ratioH, imgPath);
 					if (debug) Log.e(TAG, ""+points.length);
 					//handle possible error
 					if ((points[0] == -1) && (points[1] == -1)) {
@@ -161,7 +172,8 @@ public class MainActivity extends Activity {
 					} else if ((points[0] == -2) && (points[1] == -2)) {
 						Toast.makeText(MainActivity.this, "Error in stasm_search_single!", Toast.LENGTH_LONG).show();
 					} else if ((points[0] == -3) && (points[1] == -3)) {
-						Toast.makeText(MainActivity.this, "No face found in ~~~/face.jpg", Toast.LENGTH_LONG).show();						
+						Toast.makeText(MainActivity.this, "No face found in ~~~/face.jpg", Toast.LENGTH_LONG).show();	
+						sv.setBM(mImage);
 					} else {
 						sv.setBM(mImage, points);
 					}
@@ -177,7 +189,8 @@ public class MainActivity extends Activity {
     
 	void Initialize() {
 		try {
-			Bitmap temp = BitmapFactory.decodeResource(getResources(), R.drawable.face);
+			//Bitmap temp = BitmapFactory.decodeResource(getResources(), R.drawable.face);
+			Bitmap temp = BitmapFactory.decodeFile(imgPath);
 			if (debug) Log.e(TAG, "Original Image: "+temp.getWidth()+"X"+ temp.getHeight());
 				
 			int finalImgWidth  = screenWW;
@@ -190,7 +203,8 @@ public class MainActivity extends Activity {
 			if (debug) Log.e(TAG, "Scaled Image: "+ mWidth+"X"+mHeight+" "+ratioW+" "+ratioH);
 			
 			sv = (SampleView) findViewById(R.id.sv);
-			sv.setBM(mImage);
+
+			sv.setBM(temp);
 			sv.invalidate();
 			temp.recycle();
 		} catch (Exception e) {
