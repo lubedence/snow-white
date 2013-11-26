@@ -19,10 +19,13 @@ public class SampleView extends ImageView {
     private int ww = 320;
     private int hh = 480;
     private boolean drawMark = false;
+    private Context c;
     
 	public SampleView(Context context, AttributeSet attrs) {
 		super(context, attrs);
         setFocusable(true);
+        
+        c = context;
         
         rPaint = new Paint();
         rPaint.setColor(Color.RED);
@@ -70,6 +73,11 @@ public class SampleView extends ImageView {
     	if (bm != null && !bm.isRecycled()) {
     		canvas.drawBitmap(bm, 0, 0, null);
     	}
+    	if (bm == null)
+    		Toast.makeText(c, "NULL", Toast.LENGTH_LONG).show();
+    	else if (bm.isRecycled())
+    		Toast.makeText(c, "REC", Toast.LENGTH_LONG).show();
+    		
         if (drawMark) DrawPoints(canvas, 3);
     }
     

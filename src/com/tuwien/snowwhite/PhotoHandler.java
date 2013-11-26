@@ -21,12 +21,10 @@ public class PhotoHandler implements PictureCallback {
 
   private final Context context;
   private CamActivity act = null;
-  private int camId = 0;
 
-  public PhotoHandler(Context context, CamActivity act, int camId) {
+  public PhotoHandler(Context context, CamActivity act) {
     this.context = context;
     this.act = act;
-    this.camId = camId;
   }
 
   @Override
@@ -52,11 +50,18 @@ public class PhotoHandler implements PictureCallback {
     File pictureFile = new File(filename);
 
     try {
+    	BitmapFactory.Options options=new BitmapFactory.Options();
+    	options.inJustDecodeBounds=true;
+    	BitmapFactory.decodeByteArray(data, 0, data.length, options);
+    	options.inSampleSize=getScale(options.outWidth, options.outHeight,1200);
+    	options.inJustDecodeBounds=false;
     	
-    	Bitmap realImage = BitmapFactory.decodeByteArray(data, 0, data.length);
+    	Bitmap realImage = BitmapFactory.decodeByteArray(data, 0, data.length,options);
         android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-        android.hardware.Camera.getCameraInfo(camId, info);
+        android.hardware.Camera.getCameraInfo(act.getUsedCamId(), info);
         Bitmap bitmap = rotate(realImage, info.orientation);
+        
+        
       
       FileOutputStream fos = new FileOutputStream(pictureFile);
       //fos.write(data);
@@ -64,6 +69,8 @@ public class PhotoHandler implements PictureCallback {
       fos.close();
       Toast.makeText(context, "New Image saved:" + photoFile, Toast.LENGTH_LONG).show();
       
+      realImage.recycle();
+      bitmap.recycle();
       
      act.afterImgSaved(filename);
       
@@ -75,12 +82,28 @@ public class PhotoHandler implements PictureCallback {
     }
   }
   
+  private int getScale(int w, int h, int maxWidth){
+	  if(w > maxWidth || h > maxWidth){
+		    float f = 0;
+		    if(w>h)
+		    	f = (float)w/maxWidth;
+		    else
+		    	f = (float)h/maxWidth;
+		    
+		    return Math.round(f);
+	    }
+	  else
+		  return 1;
+	  
+  }
+  
   private Bitmap rotate(Bitmap bitmap, int degree) {
 	    int w = bitmap.getWidth();
 	    int h = bitmap.getHeight();
-
 	    Matrix mtx = new Matrix();
-	    mtx.postRotate(degree);
+	    
+	    if(w>h)
+	    	mtx.postRotate(degree);
 
 	    return Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, true);
 	}

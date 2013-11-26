@@ -117,9 +117,8 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
-		setTheme(android.R.style.Theme_Light);
+		//setTheme(android.R.style.Theme_Light);
 		setContentView(R.layout.activity_main);
-		setTitle("Stasm Android Demo by Dr. Furkan");
 		
 		//GET IMG FILE
 		Intent intent = getIntent();
@@ -175,6 +174,8 @@ public class MainActivity extends Activity {
 						Toast.makeText(MainActivity.this, "No face found in ~~~/face.jpg", Toast.LENGTH_LONG).show();	
 						sv.setBM(mImage);
 					} else {
+						if (mImage == null)
+							Toast.makeText(MainActivity.this, "IMG == NULL", Toast.LENGTH_LONG).show();
 						sv.setBM(mImage, points);
 					}
 				}
@@ -203,13 +204,17 @@ public class MainActivity extends Activity {
 			if (debug) Log.e(TAG, "Scaled Image: "+ mWidth+"X"+mHeight+" "+ratioW+" "+ratioH);
 			
 			sv = (SampleView) findViewById(R.id.sv);
+			
+			Toast.makeText(MainActivity.this, "W&H:"+finalImgWidth+"-"+finalImgHeight, Toast.LENGTH_LONG).show();
 
 			sv.setBM(temp);
 			sv.invalidate();
 			temp.recycle();
 		} catch (Exception e) {
+			Toast.makeText(MainActivity.this, "EXCEPTION", Toast.LENGTH_LONG).show();
 			if (debug) Log.e(TAG, "Initialize():"+e.toString());
 		} catch (OutOfMemoryError oe) {
+			Toast.makeText(MainActivity.this, "OUT OF MEMORY", Toast.LENGTH_LONG).show();
 		}
 	}
 }
