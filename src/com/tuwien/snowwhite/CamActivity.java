@@ -49,6 +49,11 @@ public class CamActivity extends Activity {
 		  if (!findCameras()) {
 			  Toast.makeText(this, "No camera found.",Toast.LENGTH_LONG).show();
 		  } else {
+			  
+			  ImageButton btn=(ImageButton)findViewById(R.id.button_flash);
+			  if(!hasFlash) btn.setVisibility(View.INVISIBLE);
+			  else btn.setVisibility(View.VISIBLE);
+			  
 			  if(mPreview == null){
 				  mPreview = new CameraPreview(this, camera);
 				  FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
@@ -106,6 +111,10 @@ public class CamActivity extends Activity {
 		  button.setImageDrawable(this.getResources().getDrawable( R.drawable.flash_on ));
 	  else
 		  button.setImageDrawable(this.getResources().getDrawable( R.drawable.flash_off ));
+  }
+  
+  public void backToMain(View view){
+	  finish();
   }
   
   public void chooseStoredImg(View view){

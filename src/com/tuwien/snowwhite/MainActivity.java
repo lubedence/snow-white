@@ -207,7 +207,7 @@ public class MainActivity extends Activity {
 			
 			Toast.makeText(MainActivity.this, "W&H:"+finalImgWidth+"-"+finalImgHeight, Toast.LENGTH_LONG).show();
 
-			sv.setBM(temp);
+			sv.setBM(mImage);
 			sv.invalidate();
 			temp.recycle();
 		} catch (Exception e) {

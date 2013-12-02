@@ -45,10 +45,6 @@ extern "C" {
    		if (!foundface) 
    		{
    			__android_log_print(ANDROID_LOG_ERROR, "StasmAndroidDemo", "no face found");
-   			//for( int i = 0 ; i < 500 ; i ++ ){
-   			//	__android_log_print(ANDROID_LOG_ERROR, "luky", "SCHAUDO:%c",data[i]);
-   			//	}
-
    			out[0] = -3;
     		out[1] = -3;
     		img.release();

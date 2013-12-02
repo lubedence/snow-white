@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?><LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+    
+    		<FrameLayout
+		    android:id="@+id/camera_preview"
+		    android:layout_width="fill_parent"
+		    android:layout_height="0dip"
+		    android:layout_weight="1"
+		    />
+    
+		    <LinearLayout
+		    android:orientation="horizontal"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_gravity="center"
+		    >
+		    
+		        <ImageButton
+			    android:id="@+id/button_help"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:onClick="startHelp"
+			    android:src="@drawable/help"
+		    	style="?android:attr/borderlessButtonStyle"
+		    	android:background="@android:color/transparent"
+			    />
+		        
+		        <Button
+			    android:id="@+id/button_start"
+			    android:layout_width="0dip"
+			    android:layout_height="fill_parent"
+			    android:layout_weight="1"
+			    android:onClick="startMain"
+			    android:text="Start"
+		    	style="?android:attr/borderlessButtonStyle"
+			    />
+		        
+		        <ImageButton
+			    android:id="@+id/button_settings"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:onClick="startSettings"
+			    android:src="@drawable/settings"
+		    	style="?android:attr/borderlessButtonStyle"
+		    	android:background="@android:color/transparent"
+			    />
+		        
+		    </LinearLayout>
+</LinearLayout>

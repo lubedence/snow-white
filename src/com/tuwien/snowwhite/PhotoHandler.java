@@ -102,8 +102,11 @@ public class PhotoHandler implements PictureCallback {
 	    int h = bitmap.getHeight();
 	    Matrix mtx = new Matrix();
 	    
-	    if(w>h)
+	    if(w>h){
 	    	mtx.postRotate(degree);
+	    	mtx.preScale(1, -1);
+	    }
+	    else mtx.preScale(-1, 1);
 
 	    return Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, true);
 	}
