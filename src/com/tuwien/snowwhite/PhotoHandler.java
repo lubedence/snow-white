@@ -104,9 +104,9 @@ public class PhotoHandler implements PictureCallback {
 	    
 	    if(w>h){
 	    	mtx.postRotate(degree);
-	    	mtx.preScale(1, -1);
+	    	if(act.isFrontCamera())	mtx.preScale(1, -1);
 	    }
-	    else mtx.preScale(-1, 1);
+	    else if(act.isFrontCamera()) mtx.preScale(-1, 1);
 
 	    return Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, true);
 	}

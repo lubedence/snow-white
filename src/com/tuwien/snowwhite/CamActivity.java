@@ -86,6 +86,10 @@ public class CamActivity extends Activity {
 	  cameraSetUp();
 	  }
   
+  public boolean isFrontCamera(){
+	  return frontCamUsed;
+  }
+  
   public void useFlash(View view){
 	  
 	  if(!hasFlash)

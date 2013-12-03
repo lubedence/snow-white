@@ -21,6 +21,7 @@ import android.os.Message;
 import android.content.Context;
 import android.content.Intent;
 import android.view.Display;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 import android.os.Looper;
@@ -46,7 +47,12 @@ public class MainActivity extends Activity {
   	private float ratioW = 0;
   	private float ratioH = 0;
   	
+  	private int[] points;
+  	
   	private String imgPath = "";
+  	
+  	public static String IMAGEPATH = "imgpath";
+  	public static String FEATUREARRAY = "featurearray";
   		
     public native int[] FindFaceLandmarks(float ratioW, float ratioH, String path);
     
@@ -123,7 +129,6 @@ public class MainActivity extends Activity {
 		//GET IMG FILE
 		Intent intent = getIntent();
 		imgPath = intent.getStringExtra("imgFile");
-		Toast.makeText(MainActivity.this, "MYFILE: "+imgPath, Toast.LENGTH_LONG).show();
 		
 		Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay(); 
 		int ori = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getOrientation();
@@ -163,7 +168,7 @@ public class MainActivity extends Activity {
 				
 				if (mImage != null) {				
 					
-					int[] points = FindFaceLandmarks(ratioW, ratioH, imgPath);
+					points = FindFaceLandmarks(ratioW, ratioH, imgPath);
 					if (debug) Log.e(TAG, ""+points.length);
 					//handle possible error
 					if ((points[0] == -1) && (points[1] == -1)) {
@@ -186,6 +191,18 @@ public class MainActivity extends Activity {
 				Looper.loop();
 			}
 		}).start();
+	}
+	
+	
+	public void goBack(View view){
+		finish();
+	}
+	
+	public void goNext(View view){
+		Intent intent = new Intent(this, ResultActivity.class);
+	    intent.putExtra(FEATUREARRAY, points);
+	    intent.putExtra(IMAGEPATH, imgPath);
+	    startActivity(intent);
 	}
     
 	void Initialize() {

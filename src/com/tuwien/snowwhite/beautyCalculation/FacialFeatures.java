@@ -2,6 +2,8 @@ package com.tuwien.snowwhite.beautyCalculation;
 
 import java.util.zip.DataFormatException;
 
+import android.util.Log;
+
 public class FacialFeatures {
 	
 	private class FeaturePoints{
@@ -17,6 +19,7 @@ public class FacialFeatures {
 	
 	private final int FEATURECOUNT = 77;
 	private FeaturePoints[] points = new FeaturePoints[FEATURECOUNT];
+	public static float GOLDENRATIO = 1.618f;
 	
 	public FacialFeatures(int[] p) throws DataFormatException{
 		if(p.length != FEATURECOUNT*2) 
@@ -26,100 +29,200 @@ public class FacialFeatures {
 			points[i] = new FeaturePoints(p[2*i], p[2*i+1]);	
 	}
 	
-	private void featureRatios(){
+	public float[] featureRatios(){
+		
+		float[] deviation = new float[8];
 		
 		//VERTICAL------------------------------------------------------------------
 		
-		//eye center - nose bottom
+		//eye center - nose bottom - mouth bottom
 		int eye_nose = points[PN.NOSE_BOTTOM].y - eyeHeight();
-		//nose bottom - mouth bottom
 		int nose_mouth = points[PN.MOUTH_BOTTOM].y - points[PN.NOSE_BOTTOM].y;
+		deviation[0] = goldenRatio(eye_nose, nose_mouth);
 		
-		//eye center - mouth center
+		//eye center - mouth center - chin bottom
 		int eye_mouth = mouthCenterHeight() - eyeHeight();
-		//mouth center - chin bottom
 		int mouth_center_chin = points[PN.FACE_BOTTOM].y - mouthCenterHeight();
+		deviation[1] = goldenRatio(eye_mouth, mouth_center_chin);
+
 		
-			//mouth top - mouth bottom
-			int mouth_top_bottom = points[PN.MOUTH_BOTTOM].y - mouthTopHeight();
-			//mouth bottom - chin bottom
-			int mouth_bottom_chin = points[PN.FACE_BOTTOM].y - points[PN.MOUTH_BOTTOM].y;
-		
-		//face top - nose peak
+		//face top - nose peak - chin bottom
 		int face_top_nose = points[PN.NOSE_PEAK].y - points[PN.FACE_TOP].y; 
-		//nose peak - chin bottom
 		int nose_chin = points[PN.FACE_BOTTOM].y - points[PN.NOSE_PEAK].y; 
-		
+		deviation[2] = goldenRatio(face_top_nose, nose_chin);
 		
 		
 		//HORIZONTAL---------------------------------------------------------------
 		
-		//1.00
-		int nose_width = noseWidth();
-		//phi^2
-		int eyes_outer_dist = eyesOuterDistance();
-		//phi^3
-		int face_width = faceWidth();
+		//nose/eye/face-width in relation
+		int nose_width = noseWidth();//1.00
+		int eyes_outer_dist = eyesOuterDistance();//phi^2
+		int face_width = faceWidth();//phi^3
+		float a = oneToOneRatio(nose_width*GOLDENRATIO*GOLDENRATIO, eyes_outer_dist);
+		float b = oneToOneRatio(nose_width*GOLDENRATIO*GOLDENRATIO*GOLDENRATIO, face_width);
+		float c = oneToOneRatio(eyes_outer_dist*GOLDENRATIO, face_width);
+		deviation[3] = (a+b+c)/3;
 		
-		//right eye width - left eye width
-		int right_left_eye_width = Math.abs(eyeLeftWidth() - eyeRightWidth());
-		//eye width - space between eyes
-		int eye_width_space_between = Math.abs((eyeLeftWidth() + eyeRightWidth())/2 - eyesInnerDistance());
+		//mouth width - space between eyes
+		deviation[4] = goldenRatio(mouthWidth(), eyesInnerDistance());
 		
-		//mouth width / space between eyes
-		float eyes_center_mouth_width = mouthWidth() / eyesInnerDistance();
+		//mouth width - nose width
+		deviation[5] = goldenRatio(mouthWidth(), noseWidth());
 		
-		//mouth width / nose width
-		float nose_mouth_width = mouthWidth() / noseWidth();
+		//eyes width should be equal
+		deviation[6] = oneToOneRatio(eyeLeftWidth(), eyeRightWidth());
 		
 		//BOTH---------------------------------------------------------------------
 		
-		//face height / face width
-		float face_height_width = faceHeight() / faceWidth();
+		//face height - face width
+		deviation[7] = goldenRatio(faceHeight(), faceWidth());
 		
+		return deviation;
 		
 	}
 	
-	private void checkSymmetry(){
+	//distance a-c
+	//b should be the golden ratio of the distance a-c
+	//return: deviation in percentage
+	private float goldenRatio(int a, int b, int c){
+		return goldenRatio(Math.abs(a-b), Math.abs(c-b));
+	}
+	
+	//distAB+distBC == distance from A to C
+	private float goldenRatio(float distAB, float distBC){
+		float ratio = 0;
+		
+		if(distAB>distBC)	ratio = distAB/distBC;
+		else				ratio = distBC/distAB;
+		
+		float diff = Math.abs(ratio-GOLDENRATIO);
+		float percent = diff*100/GOLDENRATIO;
+		
+		if(percent>100)	return 100;
+		else			return percent;
+	}
+	
+	private float oneToOneRatio(float distA, float distB){
+		float percent = 0;
+		if(distA<distB)		percent = Math.abs((distA/distB)-1)*100;
+		else				percent = Math.abs((distB/distA)-1)*100;
+		
+		if(percent>100) return 100;
+		else return percent;
+	}
+	
+	public float[] checkSymmetry(){
 		//line from face top (or nose center? cause, face top X could be not that accurate) to face bottom -> A
 		//for ex.: line from mouth left to right -> B
 		//calc intersection point of A and B
-		// http://community.topcoder.com/tc?module=Static&d1=tutorials&d2=geometry2#line_line_intersection
 		//both part lines(B1 and B2) should have the same length
-		//right angle between A and B
+		//TODO: check if right angle between A and B ?
+		
+		float[] deviation = new float[4];
+		
+		//vertical symmetry-line 
+		//C1 = A1x+B1y
+		int A1 = points[PN.FACE_BOTTOM].y - points[PN.FACE_TOP].y;
+		int B1 = points[PN.FACE_TOP].x - points[PN.FACE_BOTTOM].x;
+		int C1 = A1*points[PN.FACE_TOP].x+B1*points[PN.FACE_TOP].y;
+		
+		//start and end point of line B
+		float[] start = new float[2];
+		float[] end = new float[2];
+		
+		start[0] = points[PN.MOUTH_LEFT].x;
+		start[1] = points[PN.MOUTH_LEFT].y;
+		end[0] = points[PN.MOUTH_RIGHT].x;
+		end[1] = points[PN.MOUTH_RIGHT].y;	
+		deviation[0] = symRatio(start,end,intersectionPoint(A1, B1, C1, start, end));
+		
+		start[0] = points[PN.NOSE_LEFT].x;
+		start[1] = points[PN.NOSE_LEFT].y;
+		end[0] = points[PN.NOSE_RIGHT].x;
+		end[1] = points[PN.NOSE_RIGHT].y;	
+		deviation[1] = symRatio(start,end,intersectionPoint(A1, B1, C1, start, end));
+		
+		start[0] = points[PN.EYE_LEFT_OUTSIDE].x;
+		start[1] = points[PN.EYE_LEFT_OUTSIDE].y;
+		end[0] = points[PN.EYE_RIGHT_OUTSIDE].x;
+		end[1] = points[PN.EYE_RIGHT_OUTSIDE].y;	
+		deviation[2] = symRatio(start,end,intersectionPoint(A1, B1, C1, start, end));
+		
+		start[0] = points[PN.EYE_LEFT_INSIDE].x;
+		start[1] = points[PN.EYE_LEFT_INSIDE].y;
+		end[0] = points[PN.EYE_RIGHT_INSIDE].x;
+		end[1] = points[PN.EYE_RIGHT_INSIDE].y;	
+		deviation[3] = symRatio(start,end,intersectionPoint(A1, B1, C1, start, end));
+		
+		return deviation;
+	}
+	//array-length of start, end and half == [2] with x on [0] and y on [1]
+	private float symRatio(float[] start, float[] end, float[] half){
+		if(half == null)	return 100; //just in case, if no intersection point can be found (parallel lines). should never happen
+		float deltaX = Math.abs(end[0] - start[0]);
+		float deltaY = Math.abs(end[1] - start[1]);
+		float length = (float)Math.sqrt((double)(deltaX*deltaX+deltaY*deltaY));
+		deltaX = Math.abs(half[0] - start[0]);
+		deltaY = Math.abs(half[1] - start[1]);
+		float lengthHalf = (float)Math.sqrt((double)(deltaX*deltaX+deltaY*deltaY));
+		float diff = lengthHalf / (length/2);
+		if(diff>1)	diff-=1;
+		else		diff = 1-diff;
+		
+		return diff*100;
 	}
 	
+	//array-length of start and end == [2] with x on [0] and y on [1]
+	//A1,B1,C1 coeff. of the symmetry line
+	private float[] intersectionPoint(int A1, int B1, int C1, float[] start, float[] end){
+		float A2 = end[1]-start[1];
+		float B2 = start[0]-end[0];
+		float C2 = A2*start[0]+B2*start[1];
+		
+		float det = A1*B2 - A2*B1;
+		if(det == 0.0f) return null; //should never happen
+		
+		float[] intP = new float[2];
+		
+		intP[0] = (B2*C1 - B1*C2)/det;
+		intP[1] = (A1*C2 - A2*C1)/det;
+		
+		return intP;
+	}
 	
 	private int faceWidth(){
-		return points[PN.FACE_RIGHT].x - points[PN.FACE_LEFT].x;
+		return Math.abs(points[PN.FACE_RIGHT].x - points[PN.FACE_LEFT].x);
 	}
 	
 	private int faceHeight(){
-		return points[PN.FACE_TOP].y - points[PN.FACE_BOTTOM].y;
+		return Math.abs(points[PN.FACE_TOP].y - points[PN.FACE_BOTTOM].y);
 	}
 	
 	private int eyesOuterDistance(){
-		return points[PN.EYE_RIGHT_OUTSIDE].x - points[PN.EYE_LEFT_OUTSIDE].x;
+		return Math.abs(points[PN.EYE_RIGHT_OUTSIDE].x - points[PN.EYE_LEFT_OUTSIDE].x);
 	}
 	
 	private int eyesInnerDistance(){
-		return points[PN.EYE_RIGHT_INSIDE].x - points[PN.EYE_LEFT_INSIDE].x;
+		Log.e("TULLE", "eyeleft WIDTH: "+ Math.abs(points[PN.EYE_RIGHT_INSIDE].x - points[PN.EYE_LEFT_INSIDE].x));
+		return Math.abs(points[PN.EYE_RIGHT_INSIDE].x - points[PN.EYE_LEFT_INSIDE].x);
 	}
 	
 	private int eyeLeftWidth(){
-		return points[PN.EYE_LEFT_OUTSIDE].x - points[PN.EYE_LEFT_INSIDE].x;
+		Log.e("TULLE", "eyeleft WIDTH: "+ Math.abs(points[PN.EYE_LEFT_OUTSIDE].x - points[PN.EYE_LEFT_INSIDE].x));
+		return Math.abs(points[PN.EYE_LEFT_OUTSIDE].x - points[PN.EYE_LEFT_INSIDE].x);
 	}
 	
 	private int eyeRightWidth(){
-		return points[PN.EYE_RIGHT_OUTSIDE].x - points[PN.EYE_RIGHT_INSIDE].x;
+		Log.e("TULLE", "eyeright WIDTH: "+ Math.abs(points[PN.EYE_RIGHT_OUTSIDE].x - points[PN.EYE_RIGHT_INSIDE].x));
+		return Math.abs(points[PN.EYE_RIGHT_OUTSIDE].x - points[PN.EYE_RIGHT_INSIDE].x);
 	}
 	
 	private int noseWidth(){
-		return points[PN.NOSE_RIGHT].x - points[PN.NOSE_LEFT].x;
+		return Math.abs(points[PN.NOSE_RIGHT].x - points[PN.NOSE_LEFT].x);
 	}
 	
 	private int mouthWidth(){
-		return points[PN.MOUTH_RIGHT].x - points[PN.MOUTH_LEFT].x;
+		return Math.abs(points[PN.MOUTH_RIGHT].x - points[PN.MOUTH_LEFT].x);
 	}
 	
 	private int mouthCenterHeight(){

@@ -48,6 +48,10 @@
             android:name="com.tuwien.snowwhite.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
+        <activity
+            android:name="com.tuwien.snowwhite.ResultActivity"
+            android:label="@string/title_activity_result" >
+        </activity>
     </application>
 
 </manifest>
