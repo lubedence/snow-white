@@ -69,7 +69,6 @@ public class SampleView extends ImageView {
     
     @Override 
     protected void onDraw(Canvas canvas) {
-        canvas.drawColor(Color.BLACK);
     	if (bm != null && !bm.isRecycled()) {
     		canvas.drawBitmap(bm, 0, 0, null);
     	}

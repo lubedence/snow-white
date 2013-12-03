@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#000000"
+    android:background="#ffffff"
     >
 		    <LinearLayout
 		    android:orientation="horizontal"
@@ -61,7 +61,11 @@
 		        
 		    </LinearLayout>
 		    
-		    <RelativeLayout android:layout_width="fill_parent" android:layout_height="0dip" android:layout_weight="1">
+		    <RelativeLayout 
+		        android:layout_width="fill_parent" 
+		        android:layout_height="0dip" 
+		        android:layout_weight="1">
+		        
 			  	<FrameLayout
 			    android:id="@+id/camera_preview"
 			    android:layout_width="fill_parent"
@@ -72,8 +76,8 @@
 			  	android:contentDescription="mirror-border"
 			    android:layout_width="fill_parent"
 			    android:layout_height="fill_parent"
-			    android:src="@drawable/mirror"
-			    android:scaleType="fitXY"
+			    android:src="@drawable/mirror2"
+			    android:scaleType="center"
 				/>
 		  	</RelativeLayout>
 		
