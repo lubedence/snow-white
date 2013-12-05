@@ -69,8 +69,6 @@ public class CamActivity extends Activity {
   
   
   public void takePhoto(View view) {
-	    // Do something in response to button
-	  	// get an image from the camera
 	  if(camera!=null)
   		camera.takePicture(null, null, new PhotoHandler(getApplicationContext(), this));
 	  else
@@ -80,9 +78,6 @@ public class CamActivity extends Activity {
   public void swichCamera(View view) {
 	  releaseCam();
 	  frontCamUsed = !frontCamUsed;
-	  //FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-	  //preview.removeView(mPreview);
-	  //mPreview = null;
 	  cameraSetUp();
 	  }
   
@@ -140,8 +135,18 @@ public class CamActivity extends Activity {
           int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
           String picturePath = cursor.getString(columnIndex);
           cursor.close();
+          
+          //adjust this gallery image and save a copy in the snowwhite folder
+          String newPicturePath = PhotoHandler.CreateFileName();
+          try {
+			PhotoHandler.saveAdjustedImg(newPicturePath, PhotoHandler.getResizedBitmap(picturePath, 600));
+		  } catch (Exception e) {
+			  Log.d("CamActivity:PhotoHandler:onPictureTaken", "File" + newPicturePath + "not saved: " + e.getMessage());
+	          Toast.makeText(this, "Image from gallery could not be processed.",Toast.LENGTH_LONG).show();
+	          return;
+		  }
 
-          afterImgSaved(picturePath);
+          afterImgSaved(newPicturePath);
       }
   }
   
@@ -155,6 +160,7 @@ public class CamActivity extends Activity {
 	  
       Intent intent = new Intent(this, MainActivity.class);
       intent.putExtra("imgFile", imgPath);
+      Log.d("CamActivity","START NEXT ACTIVITY");
       startActivity(intent); 
   }
   

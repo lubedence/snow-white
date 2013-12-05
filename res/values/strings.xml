@@ -11,5 +11,10 @@
     <string name="title_activity_help">HelpActivity</string>
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="title_activity_result">ResultActivity</string>
+        
+    
+    
+    <string name="settings_ff">show_ff</string>
+    
 
 </resources>

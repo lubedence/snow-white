@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#ffffff"
+    android:background="#96bec8"
     >
 		    <LinearLayout
 		    android:orientation="horizontal"
@@ -14,18 +13,6 @@
 		    android:layout_height="wrap_content"
 		    android:layout_gravity="center"
 		    >
-		    
-		        <ImageButton
-			    android:id="@+id/button_back"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:layout_weight="1"
-			    android:onClick="backToMain"
-			    android:src="@drawable/back"
-		    	style="?android:attr/borderlessButtonStyle"
-		    	android:background="@android:color/transparent"
-			    />
-		        
 		        <ImageButton
 			    android:id="@+id/button_folder"
 			    android:layout_width="wrap_content"
@@ -35,6 +22,8 @@
 			    android:src="@drawable/folder"
 		    	style="?android:attr/borderlessButtonStyle"
 		    	android:background="@android:color/transparent"
+		    	android:layout_marginBottom="10dp"
+ 				android:layout_marginTop="10dp"
 			    />
 		        
 		        <ImageButton
@@ -46,6 +35,8 @@
 			    android:src="@drawable/switchcam"
 		    	style="?android:attr/borderlessButtonStyle"
 		    	android:background="@android:color/transparent"
+		    	android:layout_marginBottom="10dp"
+ 				android:layout_marginTop="10dp"
 			    />
 		        
 		        <ImageButton
@@ -57,6 +48,8 @@
 			    android:src="@drawable/flash_off"
 		    	style="?android:attr/borderlessButtonStyle"
 		    	android:background="@android:color/transparent"
+		    	android:layout_marginBottom="10dp"
+ 				android:layout_marginTop="10dp"
 			    />
 		        
 		    </LinearLayout>
@@ -80,15 +73,43 @@
 			    android:scaleType="center"
 				/>
 		  	</RelativeLayout>
-		
-		  	<ImageButton
-		    android:id="@+id/button_capture"
-		    android:layout_width="wrap_content"
+		  	
+		    <LinearLayout
+		    android:orientation="horizontal"
+		    android:layout_width="fill_parent"
 		    android:layout_height="wrap_content"
 		    android:layout_gravity="center"
-		    android:onClick="takePhoto"
-		    android:src="@drawable/unnamed"
-		    style="?android:attr/borderlessButtonStyle"
-		    android:background="@android:color/transparent"
-		    />
+		    >
+		
+		    <ImageButton
+			    android:id="@+id/button_back"
+			    android:layout_width="wrap_content"
+			    android:layout_height="50dp"
+			    android:onClick="backToMain"
+			    android:src="@drawable/back"
+		    	android:background="#ffffff"
+ 				android:layout_marginBottom="10dp"
+ 				android:layout_marginTop="10dp"
+ 				android:layout_marginLeft="10dp"
+ 				android:layout_marginRight="5dp"
+ 				android:paddingLeft="5dp"
+ 				android:paddingRight="5dp"
+			    />
+
+		  	<Button
+			    android:id="@+id/button_capture"
+			    android:layout_width="fill_parent"
+			    android:layout_height="50dp"
+			    android:layout_gravity="center"
+			    android:onClick="takePhoto"
+			    android:text="Who is the fairest of them all?"
+			    android:background="#ffffff"
+			    android:layout_marginLeft="5dp"
+ 				android:layout_marginRight="10dp"
+ 				android:layout_marginBottom="10dp"
+ 				android:layout_marginTop="10dp"
+ 				android:paddingLeft="5dp"
+ 				android:paddingRight="5dp"
+			    />
+	</LinearLayout>  	
 </LinearLayout>

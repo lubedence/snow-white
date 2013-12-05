@@ -115,4 +115,14 @@ public class SampleView extends ImageView {
     	if (y1 > h) y1 = h; if (y2 > h) y2 = h;
     	canvas.drawLine(x1, y1, x2, y2, bPaint);
     }     
+    
+    public void clearBitmap(){
+    	if (bm != null && !bm.isRecycled()) {
+    		bm.recycle();
+    		bm = null;
+    	}
+    	else if (!bm.isRecycled()) {
+    		bm = null;
+    	}
+    }
 }

@@ -2,6 +2,7 @@ package com.tuwien.snowwhite;
 
 
 import android.app.Activity;
+import android.location.GpsStatus.NmeaListener;
 import android.os.Bundle; 
 
 import java.io.*;
@@ -151,6 +152,9 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onDestroy() {
+    	sv.clearBitmap();
+    	mImage.recycle();
+    	mImage = null;
         super.onDestroy();
     }
     
@@ -209,6 +213,7 @@ public class MainActivity extends Activity {
 		try {
 			//Bitmap temp = BitmapFactory.decodeResource(getResources(), R.drawable.face);
 			Bitmap temp = BitmapFactory.decodeFile(imgPath);
+			//Bitmap temp = PhotoHandler.getResizedBitmap(imgPath, 1200);
 			if (debug) Log.e(TAG, "Original Image: "+temp.getWidth()+"X"+ temp.getHeight());
 				
 			int finalImgWidth  = screenWW;
@@ -227,6 +232,7 @@ public class MainActivity extends Activity {
 			sv.setBM(mImage);
 			sv.invalidate();
 			temp.recycle();
+			temp = null;
 		} catch (Exception e) {
 			Toast.makeText(MainActivity.this, "EXCEPTION", Toast.LENGTH_LONG).show();
 			if (debug) Log.e(TAG, "Initialize():"+e.toString());

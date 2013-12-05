@@ -1,6 +1,7 @@
 package com.tuwien.snowwhite;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,59 +31,86 @@ public class PhotoHandler implements PictureCallback {
   @Override
   public void onPictureTaken(byte[] data, Camera camera) {
 
-    File pictureFileDir = getDir();
-
-    if (!pictureFileDir.exists() && !pictureFileDir.mkdirs()) {
-
-     // Log.d(CamActivity.DEBUG_TAG, "Can't create directory to save image.");
-      Toast.makeText(context, "Can't create directory to save image.",
-          Toast.LENGTH_LONG).show();
-      return;
-
-    }
-    
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyymmddhhmmss");
-    String date = dateFormat.format(new Date());
-    String photoFile = "Picture_" + date + ".jpg";
-
-    String filename = pictureFileDir.getPath() + File.separator + photoFile;
-
-    File pictureFile = new File(filename);
-
-    try {
-    	BitmapFactory.Options options=new BitmapFactory.Options();
-    	options.inJustDecodeBounds=true;
-    	BitmapFactory.decodeByteArray(data, 0, data.length, options);
-    	options.inSampleSize=getScale(options.outWidth, options.outHeight,1200);
-    	options.inJustDecodeBounds=false;
-    	
-    	Bitmap realImage = BitmapFactory.decodeByteArray(data, 0, data.length,options);
-        android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+    	//resize
+    	Bitmap realImage = getResizedBitmap(data,1200);
+    	data = null;
+        
+    	//rotate - mirror
+    	android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
         android.hardware.Camera.getCameraInfo(act.getUsedCamId(), info);
         Bitmap bitmap = rotate(realImage, info.orientation);
+        realImage.recycle();
+        realImage = null;
         
+        String filename = CreateFileName();
+       
+        //save adjusted image
+        try {
+	        saveAdjustedImg(filename, bitmap);
+        } catch (Exception error) {
+             Log.d("PhotoHandler:onPictureTaken", "File" + filename + "not saved: " + error.getMessage());
+             Toast.makeText(context, "Image could not be saved.",Toast.LENGTH_LONG).show();
+             return;
+        }
+        finally{
+        	bitmap.recycle();
+        	bitmap = null;
+        }
         
-      
-      FileOutputStream fos = new FileOutputStream(pictureFile);
-      //fos.write(data);
-      bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-      fos.close();
-      Toast.makeText(context, "New Image saved:" + photoFile, Toast.LENGTH_LONG).show();
-      
-      realImage.recycle();
-      bitmap.recycle();
-      
-     act.afterImgSaved(filename);
+        //proceed and go to next activity
+        act.afterImgSaved(filename);
       
       
-    } catch (Exception error) {
-     // Log.d(CamActivity.DEBUG_TAG, "File" + filename + "not saved: " + error.getMessage());
-      Toast.makeText(context, "Image could not be saved.",
-          Toast.LENGTH_LONG).show();
-    }
+    
   }
   
-  private int getScale(int w, int h, int maxWidth){
+  public static String CreateFileName(){
+	  File sdDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+	  File pictureFileDir = new File(sdDir, "Snowwhite");
+
+	  if (!pictureFileDir.exists() && !pictureFileDir.mkdirs()) {
+	    Log.d("PhotoHandler:CreateFileName", "Can't create directory to save image.");
+	    return null;
+	    }
+	  
+	  SimpleDateFormat dateFormat = new SimpleDateFormat("yyyymmddhhmmss");
+	  String date = dateFormat.format(new Date());
+	  String photoFile = "Picture_" + date + ".jpg";
+
+	  return pictureFileDir.getPath() + File.separator + photoFile;
+  }
+  
+  public static void saveAdjustedImg(String path, Bitmap source) throws Exception{
+	  File pictureFile = new File(path);
+	  
+      FileOutputStream fos = new FileOutputStream(pictureFile);
+      //fos.write(data);
+      source.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+      fos.close();      
+  }
+  
+  public static Bitmap getResizedBitmap(byte[] data, int maxWidth){
+	BitmapFactory.Options options=new BitmapFactory.Options();
+  	options.inJustDecodeBounds=true;
+  	BitmapFactory.decodeByteArray(data, 0, data.length, options);
+  	options.inSampleSize=getScale(options.outWidth, options.outHeight,maxWidth);
+  	options.inJustDecodeBounds=false;
+  	options.inPreferredConfig=Bitmap.Config.RGB_565; //memory usage = 1/2 but some quality loss
+  	
+  	return BitmapFactory.decodeByteArray(data, 0, data.length,options);
+  }
+  
+  public static Bitmap getResizedBitmap(String path, int maxWidth){
+		BitmapFactory.Options options=new BitmapFactory.Options();
+	  	options.inJustDecodeBounds=true;
+	  	BitmapFactory.decodeFile(path, options);
+	  	options.inSampleSize=getScale(options.outWidth, options.outHeight,maxWidth);
+	  	options.inJustDecodeBounds=false;
+	  	
+	  	return BitmapFactory.decodeFile(path, options);
+	  }
+  
+  private static int getScale(int w, int h, int maxWidth){
 	  if(w > maxWidth || h > maxWidth){
 		    float f = 0;
 		    if(w>h)
@@ -100,6 +128,8 @@ public class PhotoHandler implements PictureCallback {
   private Bitmap rotate(Bitmap bitmap, int degree) {
 	    int w = bitmap.getWidth();
 	    int h = bitmap.getHeight();
+	    Log.d("ROTATE IMG SIZE", "w: "+w+" h: "+h);
+	    
 	    Matrix mtx = new Matrix();
 	    
 	    if(w>h){
@@ -111,9 +141,4 @@ public class PhotoHandler implements PictureCallback {
 	    return Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, true);
 	}
 
-  private File getDir() {
-    File sdDir = Environment
-      .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-    return new File(sdDir, "CameraAPIDemo");
-  }
 } 

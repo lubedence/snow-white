@@ -2,7 +2,7 @@
 <RelativeLayout 
     android:layout_width="fill_parent" 
     android:layout_height="fill_parent" 
-    android:background="#ffffff"
+    android:background="#96bec8"
     xmlns:android="http://schemas.android.com/apk/res/android" >   
         
     
@@ -10,7 +10,7 @@
         android:id="@+id/sv" 
         android:layout_width="fill_parent" 
         android:layout_height="match_parent"
-        android:background="#ffffff"
+        android:background="#96bec8"
         />  
 
         
@@ -19,31 +19,43 @@
 		    android:orientation="horizontal"
 		    android:layout_width="fill_parent"
 		    android:layout_height="wrap_content"
-		    android:background="#ffffff"
 		    android:layout_alignParentBottom="true"
 		    >
-	        
-			  	<ImageButton
+		    
+            	<Button
 			    android:id="@+id/button_back"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
+			    android:layout_width="fill_parent"
+			    android:layout_height="50dp"
 			    android:layout_gravity="center"
 			    android:onClick="goBack"
-			    android:src="@drawable/back"
-			    style="?android:attr/borderlessButtonStyle"
-			    android:background="@android:color/transparent"
+			    android:text="Try again"
+			    android:background="#ffffff"
+			    android:layout_marginLeft="10dp"
+ 				android:layout_marginRight="5dp"
+ 				android:layout_marginBottom="10dp"
+ 				android:layout_marginTop="10dp"
+ 				android:paddingLeft="5dp"
+ 				android:drawableLeft="@drawable/back"
+ 				android:layout_weight="1"
 			    />
-			  	
-			  	<ImageButton
+	        
+			  	<Button
 			    android:id="@+id/button_next"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
+			    android:layout_width="fill_parent"
+			    android:layout_height="50dp"
 			    android:layout_gravity="center"
 			    android:onClick="goNext"
-			    android:src="@drawable/unnamed"
-			    style="?android:attr/borderlessButtonStyle"
-			    android:background="@android:color/transparent"
+			    android:text="Alright!"
+			    android:background="#ffffff"
+			    android:layout_marginLeft="5dp"
+ 				android:layout_marginRight="10dp"
+ 				android:layout_marginBottom="10dp"
+ 				android:layout_marginTop="10dp"
+ 				android:paddingRight="5dp"
+ 				android:drawableRight="@drawable/next"
+ 				android:layout_weight="1"
 			    />
+
 		  	
 		  	</LinearLayout>
         
