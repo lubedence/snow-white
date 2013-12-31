@@ -2,6 +2,10 @@ package com.tuwien.snowwhite.beautyCalculation;
 
 import java.util.zip.DataFormatException;
 
+import com.tuwien.snowwhite.R;
+
+import android.content.Context;
+import android.content.res.Resources;
 import android.util.Log;
 
 public class FacialFeatures {
@@ -17,40 +21,58 @@ public class FacialFeatures {
 		
 	}
 	
+	private String[] ratioText = null;
+	private String[] symmetryText = null;
+	
 	private final int FEATURECOUNT = 77;
 	private FeaturePoints[] points = new FeaturePoints[FEATURECOUNT];
 	public static float GOLDENRATIO = 1.618f;
 	
-	public FacialFeatures(int[] p) throws DataFormatException{
+	private Context context = null;
+	
+	public FacialFeatures(int[] p, Context c) throws DataFormatException{
 		if(p.length != FEATURECOUNT*2) 
 			throw new DataFormatException("Wrong array length. Should be "+FEATURECOUNT+"*2");
+		
+		context = c;
 		
 		for(int i=0; i<FEATURECOUNT; i++) 
 			points[i] = new FeaturePoints(p[2*i], p[2*i+1]);	
 	}
 	
+	
+	public String[] featureRatiosText(){
+		return ratioText;
+	}
+	
+	public String[] symmetryText(){
+		return symmetryText;
+	}
+	
+	
 	public float[] featureRatios(){
 		
-		float[] deviation = new float[8];
-		
+		float[] deviation = new float[7];
+		ratioText = new String[7];
 		//VERTICAL------------------------------------------------------------------
-		
+
 		//eye center - nose bottom - mouth bottom
 		int eye_nose = points[PN.NOSE_BOTTOM].y - eyeHeight();
 		int nose_mouth = points[PN.MOUTH_BOTTOM].y - points[PN.NOSE_BOTTOM].y;
 		deviation[0] = goldenRatio(eye_nose, nose_mouth);
+		ratioText[0] = context.getString(R.string.eye_nose_mouth); 
 		
 		//eye center - mouth center - chin bottom
 		int eye_mouth = mouthCenterHeight() - eyeHeight();
 		int mouth_center_chin = points[PN.FACE_BOTTOM].y - mouthCenterHeight();
 		deviation[1] = goldenRatio(eye_mouth, mouth_center_chin);
-
+		ratioText[1] = context.getString(R.string.eye_mouth_chin);
 		
 		//face top - nose peak - chin bottom
 		int face_top_nose = points[PN.NOSE_PEAK].y - points[PN.FACE_TOP].y; 
 		int nose_chin = points[PN.FACE_BOTTOM].y - points[PN.NOSE_PEAK].y; 
 		deviation[2] = goldenRatio(face_top_nose, nose_chin);
-		
+		ratioText[2] = context.getString(R.string.forehead_nose_chin);
 		
 		//HORIZONTAL---------------------------------------------------------------
 		
@@ -62,20 +84,24 @@ public class FacialFeatures {
 		float b = oneToOneRatio(nose_width*GOLDENRATIO*GOLDENRATIO*GOLDENRATIO, face_width);
 		float c = oneToOneRatio(eyes_outer_dist*GOLDENRATIO, face_width);
 		deviation[3] = (a+b+c)/3;
+		ratioText[3] = context.getString(R.string.nose_eye_faceWidth);
 		
 		//mouth width - space between eyes
 		deviation[4] = goldenRatio(mouthWidth(), eyesInnerDistance());
+		ratioText[4] = context.getString(R.string.mouth_eyeDistance);
 		
 		//mouth width - nose width
 		deviation[5] = goldenRatio(mouthWidth(), noseWidth());
+		ratioText[5] = context.getString(R.string.mouth_nose);
 		
 		//eyes width should be equal
-		deviation[6] = oneToOneRatio(eyeLeftWidth(), eyeRightWidth());
+		//deviation[6] = oneToOneRatio(eyeLeftWidth(), eyeRightWidth());
 		
 		//BOTH---------------------------------------------------------------------
 		
 		//face height - face width
-		deviation[7] = goldenRatio(faceHeight(), faceWidth());
+		deviation[6] = goldenRatio(faceHeight(), faceWidth());
+		ratioText[6] = context.getString(R.string.faceHeight_faceWidth);
 		
 		return deviation;
 		
@@ -119,6 +145,7 @@ public class FacialFeatures {
 		//TODO: check if right angle between A and B ?
 		
 		float[] deviation = new float[4];
+		symmetryText = new String[4];
 		
 		//vertical symmetry-line 
 		//C1 = A1x+B1y
@@ -135,24 +162,28 @@ public class FacialFeatures {
 		end[0] = points[PN.MOUTH_RIGHT].x;
 		end[1] = points[PN.MOUTH_RIGHT].y;	
 		deviation[0] = symRatio(start,end,intersectionPoint(A1, B1, C1, start, end));
+		symmetryText[0] = context.getString(R.string.mouth);
 		
 		start[0] = points[PN.NOSE_LEFT].x;
 		start[1] = points[PN.NOSE_LEFT].y;
 		end[0] = points[PN.NOSE_RIGHT].x;
 		end[1] = points[PN.NOSE_RIGHT].y;	
 		deviation[1] = symRatio(start,end,intersectionPoint(A1, B1, C1, start, end));
+		symmetryText[1] = context.getString(R.string.nose);
 		
 		start[0] = points[PN.EYE_LEFT_OUTSIDE].x;
 		start[1] = points[PN.EYE_LEFT_OUTSIDE].y;
 		end[0] = points[PN.EYE_RIGHT_OUTSIDE].x;
 		end[1] = points[PN.EYE_RIGHT_OUTSIDE].y;	
 		deviation[2] = symRatio(start,end,intersectionPoint(A1, B1, C1, start, end));
+		symmetryText[2] = context.getString(R.string.eyesInside);
 		
 		start[0] = points[PN.EYE_LEFT_INSIDE].x;
 		start[1] = points[PN.EYE_LEFT_INSIDE].y;
 		end[0] = points[PN.EYE_RIGHT_INSIDE].x;
 		end[1] = points[PN.EYE_RIGHT_INSIDE].y;	
 		deviation[3] = symRatio(start,end,intersectionPoint(A1, B1, C1, start, end));
+		symmetryText[3] = context.getString(R.string.eyesOutside);
 		
 		return deviation;
 	}
@@ -203,17 +234,14 @@ public class FacialFeatures {
 	}
 	
 	private int eyesInnerDistance(){
-		Log.e("TULLE", "eyeleft WIDTH: "+ Math.abs(points[PN.EYE_RIGHT_INSIDE].x - points[PN.EYE_LEFT_INSIDE].x));
 		return Math.abs(points[PN.EYE_RIGHT_INSIDE].x - points[PN.EYE_LEFT_INSIDE].x);
 	}
 	
 	private int eyeLeftWidth(){
-		Log.e("TULLE", "eyeleft WIDTH: "+ Math.abs(points[PN.EYE_LEFT_OUTSIDE].x - points[PN.EYE_LEFT_INSIDE].x));
 		return Math.abs(points[PN.EYE_LEFT_OUTSIDE].x - points[PN.EYE_LEFT_INSIDE].x);
 	}
 	
 	private int eyeRightWidth(){
-		Log.e("TULLE", "eyeright WIDTH: "+ Math.abs(points[PN.EYE_RIGHT_OUTSIDE].x - points[PN.EYE_RIGHT_INSIDE].x));
 		return Math.abs(points[PN.EYE_RIGHT_OUTSIDE].x - points[PN.EYE_RIGHT_INSIDE].x);
 	}
 	

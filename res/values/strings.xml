@@ -11,10 +11,31 @@
     <string name="title_activity_help">HelpActivity</string>
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="title_activity_result">ResultActivity</string>
-        
-    
-    
     <string name="settings_ff">show_ff</string>
+    <string name="title_activity_celebrity">CelebrityActivity</string>
+    
+    
+    <string name="button_main_start">Mirror, mirror on the wall &#8230;</string>
+    <string name="button_take_picture">Who is the fairest of them all?</string>
+    <string name="button_try_again">Try again</string>
+    <string name="button_alright">Alright!</string>
+    
+    <string name="resultlist_gRatio_error">Golden Ratios Error</string>
+    <string name="resultlist_fSymmetry_error">Face Symmetry Error</string>
+    <string name="eye_nose_mouth">Eye - Nose - Mouth</string>
+    <string name="eye_mouth_chin">Eye - Mouth - Chin</string>
+    <string name="forehead_nose_chin">Forehead - Nose - Chin</string>
+    <string name="nose_eye_faceWidth">Nose - Eye - Face width</string>
+    <string name="mouth_eyeDistance">Mouth - Eye distance</string>
+    <string name="mouth_nose">Mouth - Nose</string>
+    <string name="faceHeight_faceWidth">Face height - Face widht</string>
+    <string name="mouth">Mouth</string>
+    <string name="nose">Nose</string>
+    <string name="eyesInside">Eyes inside</string>
+    <string name="eyesOutside">Eyes outside</string>
+    
+    <string name="title_setting">Settings</string>
+    <string name="title_help">Help me!</string>
     
 
 </resources>

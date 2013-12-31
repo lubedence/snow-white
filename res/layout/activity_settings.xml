@@ -23,15 +23,15 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:onClick="backToMain"
-			android:src="@drawable/back"
+			android:src="@drawable/ic_back"
 			android:background="#ffffff"
 			android:paddingRight="10dp"/>
     
 	    <TextView
-	        android:layout_width="fill_parent"
+	        android:layout_width="0dip"
 	        android:layout_height="wrap_content"
 	        android:layout_weight="1"
-	        android:text="Settings"
+	        android:text="@string/title_setting"
 	    	android:textSize="40sp"/>
     
     </LinearLayout>
@@ -67,7 +67,7 @@
 			        android:text="Show captured image with facial features as drawn dots on the image"
 			        android:layout_below="@id/setting_ff_title"
 		        	android:layout_alignParentLeft="true"
-		       		android:layout_toLeftOf="@+id/setting_ff_check"/>
+		       		/>
 		        
 		        <CheckBox
 		            android:id="@+id/setting_ff_check"

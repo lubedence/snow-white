@@ -107,9 +107,9 @@ public class CamActivity extends Activity {
   private void setFlashIcon(boolean flashOn){
 	  final ImageButton button = (ImageButton) findViewById(R.id.button_flash);
 	  if(flashOn)
-		  button.setImageDrawable(this.getResources().getDrawable( R.drawable.flash_on ));
+		  button.setImageDrawable(this.getResources().getDrawable( R.drawable.ic_flash_on ));
 	  else
-		  button.setImageDrawable(this.getResources().getDrawable( R.drawable.flash_off ));
+		  button.setImageDrawable(this.getResources().getDrawable( R.drawable.ic_flash_off ));
   }
   
   public void backToMain(View view){

@@ -1,15 +1,125 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ResultActivity" >
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffffff"
+    >
 
 
     <TextView
-        android:id="@+id/text_id"
+        android:id="@+id/result_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:paddingLeft="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:textSize="50sp"
+        android:textColor="#000000"/>
+    
+    <View
+		    android:layout_width="fill_parent"
+		    android:layout_height="1dp"
+		    android:background="@android:color/darker_gray"/>
+    
+    <ScrollView 
+    android:layout_width="fill_parent"
+    android:layout_height="0dip"
+    android:layout_weight="1"
+    android:background="#ffffff">
+    <LinearLayout 
+		    android:orientation="vertical"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    >
+		    
+        
+	    <LinearLayout 
+	        android:id="@+id/result_content" 
+		    android:orientation="vertical"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:background="#ffffff"
+		    android:paddingTop="10dp"
+		    android:paddingBottom="10dp"
+		    >
+		    
+	        </LinearLayout>
+	        
+	    <LinearLayout 
+	        android:id="@+id/result_content_cel" 
+		    android:orientation="vertical"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:background="#ffffff"
+		    android:paddingTop="10dp"
+		    android:paddingBottom="10dp"
+		    android:visibility="gone"
+		    >
+		    
+	        </LinearLayout>
+	        
+	    </LinearLayout>
+    
+    </ScrollView>
     
     
-</RelativeLayout>
+    <View
+		    android:layout_width="fill_parent"
+		    android:layout_height="1dp"
+		    android:background="@android:color/darker_gray"/>
+    
+    
+   
+    <RelativeLayout 
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:gravity="center"
+		    android:background="#96bec8"
+		    >
+		
+		    <ImageButton
+			    android:id="@+id/button_home"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:onClick="goHome"
+			    android:src="@drawable/ic_home"
+		    	android:background="#ffffff"
+ 				android:layout_margin="10dp"
+ 				android:padding="5dp"
+ 				android:layout_alignParentLeft="true"
+			    />
+		    
+		    
+		    
+		    <ImageButton
+			    android:id="@+id/button_details"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:onClick="goDetails"
+			    android:src="@drawable/ic_list"
+		    	android:background="#ffffff"
+ 				android:layout_margin="10dp"
+ 				android:padding="5dp"
+ 				android:layout_alignParentRight="true"
+			    />
+		    
+		    <ImageButton
+			    android:id="@+id/button_celebrities"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:onClick="goCelebrities"
+			    android:src="@drawable/ic_celebrities"
+		    	android:background="#ffffff"
+ 				android:layout_marginTop="10dp"
+ 				android:layout_marginBottom="10dp"
+ 				android:padding="5dp"
+ 				android:layout_toLeftOf="@+id/button_details"
+			    />
+
+	</RelativeLayout>
+    
+    
+</LinearLayout>

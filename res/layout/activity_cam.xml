@@ -19,7 +19,7 @@
 			    android:layout_height="wrap_content"
 			    android:layout_weight="1"
 			    android:onClick="chooseStoredImg"
-			    android:src="@drawable/folder"
+			    android:src="@drawable/ic_gallery"
 		    	style="?android:attr/borderlessButtonStyle"
 		    	android:background="@android:color/transparent"
 		    	android:layout_marginBottom="10dp"
@@ -32,7 +32,7 @@
 			    android:layout_height="wrap_content"
 			    android:layout_weight="1"
 			    android:onClick="swichCamera"
-			    android:src="@drawable/switchcam"
+			    android:src="@drawable/ic_switch_cam"
 		    	style="?android:attr/borderlessButtonStyle"
 		    	android:background="@android:color/transparent"
 		    	android:layout_marginBottom="10dp"
@@ -45,7 +45,7 @@
 			    android:layout_height="wrap_content"
 			    android:layout_weight="1"
 			    android:onClick="useFlash"
-			    android:src="@drawable/flash_off"
+			    android:src="@drawable/ic_flash_off"
 		    	style="?android:attr/borderlessButtonStyle"
 		    	android:background="@android:color/transparent"
 		    	android:layout_marginBottom="10dp"
@@ -66,11 +66,10 @@
 			    />
 			  	
 			  	<ImageView
-			  	android:contentDescription="mirror-border"
 			    android:layout_width="fill_parent"
 			    android:layout_height="fill_parent"
-			    android:src="@drawable/mirror2"
-			    android:scaleType="center"
+			    android:src="@drawable/mirror3"
+			    android:scaleType="centerInside"
 				/>
 		  	</RelativeLayout>
 		  	
@@ -86,7 +85,7 @@
 			    android:layout_width="wrap_content"
 			    android:layout_height="50dp"
 			    android:onClick="backToMain"
-			    android:src="@drawable/back"
+			    android:src="@drawable/ic_back"
 		    	android:background="#ffffff"
  				android:layout_marginBottom="10dp"
  				android:layout_marginTop="10dp"
@@ -102,7 +101,7 @@
 			    android:layout_height="50dp"
 			    android:layout_gravity="center"
 			    android:onClick="takePhoto"
-			    android:text="Who is the fairest of them all?"
+			    android:text="@string/button_take_picture"
 			    android:background="#ffffff"
 			    android:layout_marginLeft="5dp"
  				android:layout_marginRight="10dp"

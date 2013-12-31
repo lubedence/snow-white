@@ -9,8 +9,10 @@
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera.autofocus" />
-	<uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -18,20 +20,41 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
-        
         <activity
             android:name="com.tuwien.snowwhite.MainActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.tuwien.snowwhite.CamActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_cam">
+            android:label="@string/title_activity_cam"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.tuwien.snowwhite.StartActivity"
+            android:label="@string/title_activity_start"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.tuwien.snowwhite.HelpActivity"
+            android:label="@string/title_activity_help" >
+        </activity>
+        <activity
+            android:name="com.tuwien.snowwhite.SettingsActivity"
+            android:label="@string/title_activity_settings" >
+        </activity>
+        <activity
+            android:name="com.tuwien.snowwhite.ResultActivity"
+            android:label="@string/title_activity_result" >
+        </activity>
+        <activity
+            android:name="com.tuwien.snowwhite.CelebrityActivity"
+            android:label="@string/title_activity_celebrity" >
         </activity>
     </application>
 

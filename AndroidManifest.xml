@@ -52,6 +52,10 @@
             android:name="com.tuwien.snowwhite.ResultActivity"
             android:label="@string/title_activity_result" >
         </activity>
+        <activity
+            android:name="com.tuwien.snowwhite.CelebrityActivity"
+            android:label="@string/title_activity_celebrity" >
+        </activity>
     </application>
 
 </manifest>

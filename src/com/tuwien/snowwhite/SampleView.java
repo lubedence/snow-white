@@ -117,11 +117,13 @@ public class SampleView extends ImageView {
     }     
     
     public void clearBitmap(){
+    	
+    	
     	if (bm != null && !bm.isRecycled()) {
     		bm.recycle();
     		bm = null;
     	}
-    	else if (!bm.isRecycled()) {
+    	else if (bm != null && bm.isRecycled()) {
     		bm = null;
     	}
     }

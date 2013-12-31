@@ -152,9 +152,14 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onDestroy() {
-    	sv.clearBitmap();
-    	mImage.recycle();
-    	mImage = null;
+    	if(sv != null){
+    		sv.clearBitmap();
+    		sv = null;
+    	}
+    	if(mImage != null){
+    		mImage.recycle();
+    		mImage = null;
+    	}
         super.onDestroy();
     }
     
@@ -199,6 +204,14 @@ public class MainActivity extends Activity {
 	
 	
 	public void goBack(View view){
+		if(sv != null){
+    		sv.clearBitmap();
+    		sv = null;
+    	}
+    	if(mImage != null){
+    		mImage.recycle();
+    		mImage = null;
+    	}
 		finish();
 	}
 	
