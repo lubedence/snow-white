@@ -67,7 +67,7 @@ public class CamActivity extends Activity {
 	  }
   }
   
-  
+  //TODO: disable (and also all other cam-buttons like cam-swich), if cam-preview is no ready
   public void takePhoto(View view) {
 	  if(camera!=null)
   		camera.takePicture(null, null, new PhotoHandler(getApplicationContext(), this));
@@ -137,6 +137,7 @@ public class CamActivity extends Activity {
           cursor.close();
           
           //adjust this gallery image and save a copy in the snowwhite folder
+          //TODO: if picture is from snowwhite-folder and has the right size (ie: 600px wide), no need to create a adjusted image
           String newPicturePath = PhotoHandler.CreateFileName();
           try {
 			PhotoHandler.saveAdjustedImg(newPicturePath, PhotoHandler.getResizedBitmap(picturePath, 600));

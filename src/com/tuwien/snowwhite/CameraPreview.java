@@ -79,6 +79,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, now tell the camera where to draw the preview.
+    	//TODO: set flag to enable "take picture"-button
     	startPreview();     
     }
     
@@ -98,6 +99,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         // If your preview can change or rotate, take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
+    	
+    	//TODO: preview CANT change, so no need for the following stuff???
 
         if (mHolder.getSurface() == null){
           // preview surface does not exist

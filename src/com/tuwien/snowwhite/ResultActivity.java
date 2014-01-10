@@ -3,16 +3,21 @@ package com.tuwien.snowwhite;
 import java.util.zip.DataFormatException;
 
 import com.tuwien.snowwhite.beautyCalculation.FacialFeatures;
+import com.tuwien.snowwhite.celebrityData.CelebrityDataMock;
+import com.tuwien.snowwhite.celebrityData.ICelebrity;
+import com.tuwien.snowwhite.celebrityData.ICelebrityData;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -185,15 +190,19 @@ private void addDetailRow(String desc, int paddingTop){
 private void startCelebrities(){
 	contentContainer_cel =  ((LinearLayout)findViewById(R.id.result_content_cel));
 	
-	String[] celebs = getResources().getStringArray(R.array.celebrities);
+	/*String[] celebs = getResources().getStringArray(R.array.celebrities);
 	
 	for (String c : celebs){
 		addCelRow(c,33.12334343f,"face1");
-	}
+	}*/
+	ICelebrityData celData = new CelebrityDataMock(this);
+	for (ICelebrity  c : celData.getAllCelebrities())
+		addCelRow(c.getName(),c.getScore(),c.getPicture());
+	
 }
 
 
-private void addCelRow(String name, float score, String imgName){
+private void addCelRow(String name, float score, Drawable picture){
 	score = (float)Math.round(score*10) / 10.0f;
 	
 	RelativeLayout rl = new RelativeLayout(this);
@@ -202,10 +211,12 @@ private void addCelRow(String name, float score, String imgName){
 	rl.setPadding(2*paddingDp, paddingDp, 2*paddingDp, paddingDp);
 	
 	ImageView iv = new ImageView(this);
-	RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+	RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams((int)(this.getResources().getDisplayMetrics().density) * 200,(int)(this.getResources().getDisplayMetrics().density) * 200);
 	params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
 	iv.setLayoutParams(params);
-	iv.setImageResource(getResources().getIdentifier(imgName, "drawable", getPackageName()));
+	iv.setScaleType(ScaleType.CENTER_CROP);
+	//iv.setImageResource(getResources().getIdentifier(imgName, "drawable", getPackageName()));
+	iv.setImageDrawable(picture);
 	rl.addView(iv);
 	
 	TextView tv1 = new TextView(this);

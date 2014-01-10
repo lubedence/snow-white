@@ -2,11 +2,9 @@ package com.tuwien.snowwhite;
 
 
 import android.app.Activity;
-import android.location.GpsStatus.NmeaListener;
 import android.os.Bundle; 
 
 import java.io.*;
-import java.nio.ByteBuffer;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
@@ -24,6 +22,7 @@ import android.content.Intent;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView.ScaleType;
 import android.widget.Toast;
 import android.os.Looper;
 
@@ -51,6 +50,8 @@ public class MainActivity extends Activity {
   	private int[] points;
   	
   	private String imgPath = "";
+  	
+  	private boolean calculationComplete = false;
   	
   	public static String IMAGEPATH = "imgpath";
   	public static String FEATUREARRAY = "featurearray";
@@ -114,17 +115,17 @@ public class MainActivity extends Activity {
     		switch (msg.what) { 
     			case MainActivity.UPDATE_VIEW:
     				sv.invalidate();
+    				calculationComplete = true;
     				try {pd.dismiss(); pd = null;} catch (Exception e){}
-    				break;
+    			break;
     		} 
     		super.handleMessage(msg); 
     	} 
     };
 	
 	@Override
-	protected void onCreate(Bundle icicle) {
-		super.onCreate(icicle);
-		//setTheme(android.R.style.Theme_Light);
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
 		//GET IMG FILE
@@ -141,9 +142,6 @@ public class MainActivity extends Activity {
         	putDataFileInLocalDir(MainActivity.this, R.raw.haarcascade_frontalface_alt2, f_frontalface);
         	putDataFileInLocalDir(MainActivity.this, R.raw.haarcascade_mcs_lefteye, f_lefteye);
         	putDataFileInLocalDir(MainActivity.this, R.raw.haarcascade_mcs_righteye, f_righteye);
-        	
-        	//f_testface = new File(dataDir, "face.jpg");
-        	//putDataFileInLocalDir(MainActivity.this, R.drawable.face, f_testface);
         }
         
         sv = (SampleView) findViewById(R.id.sv);
@@ -170,7 +168,11 @@ public class MainActivity extends Activity {
     }
 		
 	private void processing() {
-		if (pd == null) pd = ProgressDialog.show(MainActivity.this, null, "Processing...");
+		if(calculationComplete)
+			return;
+		
+		if (pd == null) 
+			pd = ProgressDialog.show(MainActivity.this, null, "Processing...");
 		new Thread(new Runnable() { 
 			public void run() {
 				Looper.prepare(); 
@@ -180,6 +182,7 @@ public class MainActivity extends Activity {
 					points = FindFaceLandmarks(ratioW, ratioH, imgPath);
 					if (debug) Log.e(TAG, ""+points.length);
 					//handle possible error
+					//TODO: no next-button, if error occured!
 					if ((points[0] == -1) && (points[1] == -1)) {
 						Toast.makeText(MainActivity.this, "Cannot load image file ~~~/face.jpg", Toast.LENGTH_LONG).show();
 					} else if ((points[0] == -2) && (points[1] == -2)) {
@@ -189,7 +192,7 @@ public class MainActivity extends Activity {
 						sv.setBM(mImage);
 					} else {
 						if (mImage == null)
-							Toast.makeText(MainActivity.this, "IMG == NULL", Toast.LENGTH_LONG).show();
+							Toast.makeText(MainActivity.this, "IMG == NULL (this should not happen)", Toast.LENGTH_LONG).show();
 						sv.setBM(mImage, points);
 					}
 				}

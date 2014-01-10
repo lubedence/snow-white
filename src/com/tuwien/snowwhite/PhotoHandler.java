@@ -32,7 +32,7 @@ public class PhotoHandler implements PictureCallback {
   public void onPictureTaken(byte[] data, Camera camera) {
 
     	//resize
-    	Bitmap realImage = getResizedBitmap(data,1200);
+    	Bitmap realImage = getResizedBitmap(data,600);
     	data = null;
         
     	//rotate - mirror

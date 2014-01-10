@@ -22,8 +22,7 @@ public class StartActivity extends Activity {
 	}
 	
 	public void startHelp(View view){
-	    //startActivity(new Intent(this, HelpActivity.class)); 
-		startActivity(new Intent(this, CelebrityActivity.class)); 
+	    startActivity(new Intent(this, HelpActivity.class)); 
 	}
 	
 	public void startSettings(View view){
