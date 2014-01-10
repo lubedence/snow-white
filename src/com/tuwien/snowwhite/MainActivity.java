@@ -12,6 +12,7 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
 import android.app.ProgressDialog;
+import android.transition.Visibility;
 import android.util.*;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,13 +23,16 @@ import android.content.Intent;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView.ScaleType;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import android.os.Looper;
 
 public class MainActivity extends Activity {	   
 	private final String TAG = "StasmAndroidDemo";
-	private static final int UPDATE_VIEW = 0x101;
+	private static final int CALCULATION_SUCCESFUL = 0x101;
+	private static final int CALCULATION_ERROR = 0x102;
 	private boolean debug = true;
 	private ProgressDialog pd = null;
 	public static int screenWW;
@@ -113,7 +117,12 @@ public class MainActivity extends Activity {
     	// @Override 
     	public void handleMessage(Message msg) { 
     		switch (msg.what) { 
-    			case MainActivity.UPDATE_VIEW:
+    			case MainActivity.CALCULATION_SUCCESFUL:
+    				sv.invalidate();
+    				calculationComplete = true;
+    				((Button) findViewById(R.id.button_next)).setVisibility(View.VISIBLE);
+    				try {pd.dismiss(); pd = null;} catch (Exception e){}
+    			case MainActivity.CALCULATION_ERROR:
     				sv.invalidate();
     				calculationComplete = true;
     				try {pd.dismiss(); pd = null;} catch (Exception e){}
@@ -177,12 +186,14 @@ public class MainActivity extends Activity {
 			public void run() {
 				Looper.prepare(); 
 				
+				Message m = new Message();
+				m.what = MainActivity.CALCULATION_ERROR;
+				
 				if (mImage != null) {				
-					
 					points = FindFaceLandmarks(ratioW, ratioH, imgPath);
+
 					if (debug) Log.e(TAG, ""+points.length);
 					//handle possible error
-					//TODO: no next-button, if error occured!
 					if ((points[0] == -1) && (points[1] == -1)) {
 						Toast.makeText(MainActivity.this, "Cannot load image file ~~~/face.jpg", Toast.LENGTH_LONG).show();
 					} else if ((points[0] == -2) && (points[1] == -2)) {
@@ -191,14 +202,11 @@ public class MainActivity extends Activity {
 						Toast.makeText(MainActivity.this, "No face found in ~~~/face.jpg", Toast.LENGTH_LONG).show();	
 						sv.setBM(mImage);
 					} else {
-						if (mImage == null)
-							Toast.makeText(MainActivity.this, "IMG == NULL (this should not happen)", Toast.LENGTH_LONG).show();
 						sv.setBM(mImage, points);
+						m.what = MainActivity.CALCULATION_SUCCESFUL;
 					}
 				}
 
-				Message m = new Message(); 
-				m.what = MainActivity.UPDATE_VIEW;
 				MainActivity.this.myViewUpdateHandler.sendMessage(m);
 				Looper.loop();
 			}

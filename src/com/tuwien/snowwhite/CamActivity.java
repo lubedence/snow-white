@@ -67,8 +67,12 @@ public class CamActivity extends Activity {
 	  }
   }
   
-  //TODO: disable (and also all other cam-buttons like cam-swich), if cam-preview is no ready
   public void takePhoto(View view) {
+	  if(!mPreview.isPreviewRunning()){
+		  Toast.makeText(this, "Preview is loading...", Toast.LENGTH_SHORT).show();
+		  return;
+	  }
+		  
 	  if(camera!=null)
   		camera.takePicture(null, null, new PhotoHandler(getApplicationContext(), this));
 	  else
@@ -136,8 +140,14 @@ public class CamActivity extends Activity {
           String picturePath = cursor.getString(columnIndex);
           cursor.close();
           
+         
+          //if picture is from snowwhite-folder no need to create an adjusted image
+          if(picturePath.contains(PhotoHandler.getPictureDirectory())){
+        	  afterImgSaved(picturePath);
+        	  return;
+          }
+          
           //adjust this gallery image and save a copy in the snowwhite folder
-          //TODO: if picture is from snowwhite-folder and has the right size (ie: 600px wide), no need to create a adjusted image
           String newPicturePath = PhotoHandler.CreateFileName();
           try {
 			PhotoHandler.saveAdjustedImg(newPicturePath, PhotoHandler.getResizedBitmap(picturePath, 600));
@@ -151,7 +161,7 @@ public class CamActivity extends Activity {
       }
   }
   
-  //called by PhotoHandler & onActivityResult
+  //called by PhotoHandler(take photo with cam) & onActivityResult(load photo from gallery)
   public void afterImgSaved(String imgPath){
 	  FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
 	  preview.removeView(mPreview);

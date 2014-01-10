@@ -9,18 +9,21 @@ import android.hardware.Camera;
 import android.hardware.Camera.Face;
 import android.hardware.Camera.FaceDetectionListener;
 import android.hardware.Camera.Parameters;
+import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 /** A basic Camera preview class */
-public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, FaceDetectionListener {
+public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
     private String TAG = "CameraPreview";
     private int viewWidth = 640;
+    private boolean previewIsRunning = false;
 
     public CameraPreview(Context context, Camera camera) {
         super(context);
@@ -52,22 +55,30 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         	p.setRotation(270);
         	
         	List<Size> sizes = p.getSupportedPreviewSizes();
-        	Log.e("----PREVIEW-SIZE----", "W "+this.getWidth()+" H "+this.getHeight());
         	Size optimalSize = getOptimalPreviewSize(sizes, this.getWidth(), this.getHeight());
-        	Log.e("----PREVIEW-SIZE OPTIMAL----", "W "+optimalSize.width+" H "+optimalSize.height);
         	p.setPreviewSize(optimalSize.width, optimalSize.height);
         	        	
         	mCamera.setParameters(p);	
-        	//mCamera.setFaceDetectionListener(this);
         	mCamera.setDisplayOrientation(90);
             mCamera.setPreviewDisplay(mHolder);
+            mCamera.setOneShotPreviewCallback(new PreviewCallback() {
+				@Override
+				public void onPreviewFrame(byte[] data, Camera camera) {
+					previewIsRunning = true;
+				}
+			});
             mCamera.startPreview();
-           // mCamera.startFaceDetection();
+            
             
         } catch (IOException e) {
             Log.d(TAG, "Error setting camera preview: " + e.getMessage());
         }
     }
+    
+    public boolean isPreviewRunning(){
+    	return previewIsRunning;
+    }
+  
     
     @Override
     public void onLayout(boolean changed, int left, int top, int right, int bottom) {
@@ -90,6 +101,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceDestroyed(SurfaceHolder holder) {
         // empty. Take care of releasing the Camera preview in your activity.
     	if(mCamera != null){
+    		previewIsRunning = false;
     		mCamera.release();
     		mCamera = null;
     	}
@@ -102,7 +114,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     	
     	//TODO: preview CANT change, so no need for the following stuff???
 
-        if (mHolder.getSurface() == null){
+       /* if (mHolder.getSurface() == null){
           // preview surface does not exist
           return;
         }
@@ -124,7 +136,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         } catch (Exception e){
             Log.d(TAG, "Error starting camera preview: " + e.getMessage());
-        }
+        }*/
     }
     
     

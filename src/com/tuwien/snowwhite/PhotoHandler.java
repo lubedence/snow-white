@@ -64,7 +64,8 @@ public class PhotoHandler implements PictureCallback {
     
   }
   
-  public static String CreateFileName(){
+  //returns null on failure while creating directory
+  public static String getPictureDirectory(){
 	  File sdDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 	  File pictureFileDir = new File(sdDir, "Snowwhite");
 
@@ -73,11 +74,19 @@ public class PhotoHandler implements PictureCallback {
 	    return null;
 	    }
 	  
+	  return pictureFileDir.getPath();
+  }
+  
+  public static String CreateFileName(){
 	  SimpleDateFormat dateFormat = new SimpleDateFormat("yyyymmddhhmmss");
 	  String date = dateFormat.format(new Date());
 	  String photoFile = "Picture_" + date + ".jpg";
-
-	  return pictureFileDir.getPath() + File.separator + photoFile;
+	  
+	  String dir = getPictureDirectory();
+	  if(dir == null)
+		  return null;
+	  
+	  return getPictureDirectory() + File.separator + photoFile;
   }
   
   public static void saveAdjustedImg(String path, Bitmap source) throws Exception{

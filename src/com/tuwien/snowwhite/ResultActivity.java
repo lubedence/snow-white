@@ -129,7 +129,7 @@ public class ResultActivity extends Activity {
 		result = (float)Math.round(total*10) / 10.0f;
 		
 		TextView title = (TextView)findViewById(R.id.result_title);
-		title.setText(result+"/100");
+		title.setText(result+"%");
 	}
 	
 	private void addDetailRow(String desc, float score, int color){
@@ -150,7 +150,7 @@ public class ResultActivity extends Activity {
 		rl.addView(tv1);
 				
 		TextView tv2 = new TextView(this);
-		tv2.setText(score+"");
+		tv2.setText(score+"%");
 		tv2.setTextColor(color);
 		RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 		params2.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
@@ -229,7 +229,7 @@ private void addCelRow(String name, float score, Drawable picture){
 	rl.addView(tv1);
 			
 	TextView tv2 = new TextView(this);
-	tv2.setText(score+"");
+	tv2.setText(score+"%");
 	RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 	params2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
 	params2.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
