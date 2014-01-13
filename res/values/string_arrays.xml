@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="setting_imgSize_spinner_array">
-        <item>very small</item>
-        <item>small</item>
-        <item>medium</item>
-        <item>large</item>
-        <item>extra large</item>
+   
+    <!-- .................................................. -->
+    <!-- THE FOLLOWING TWO ARRAYS MUST HAVE THE SAME LENGTH -->
+    <string-array name="setting_imgSize_desc">
+        <item>Small</item>
+        <item>Standard</item>
+        <item>Large</item>
     </string-array>
     
-    
-    
-    <string-array name="celebrities">
-        <item>Justin Bieber</item>
-        <item>Angelina Jolie</item>
-        <item>Brad Pitt</item>
-        <item>Lady Gaga</item>
-        <item>Miley Cyrus</item>
+    <string-array name="setting_imgSize_values">
+        <item>400</item>
+        <item>600</item>
+        <item>1000</item>
     </string-array>
+    <!-- .................................................. -->
+    
+    <string-array name="smiley_categories">
+        <item>0</item><!--  0  - 85.99 Smiley :-( -->
+        <item>86</item><!-- 86 - 88.99 Smiley :-| -->
+        <item>89</item><!-- 89 - 91.99 Smiley :-) -->
+        <item>92</item><!-- 92 - 100   Smiley :-D -->
+    </string-array>
+    
 </resources>

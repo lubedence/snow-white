@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Snowwhite</string>
+    
+    <string name="button_main_start">Spieglein, Spieglein an der Wand &#8230;</string>
+    <string name="button_main_start_loading">Lade Kamera &#8230;</string>
+    <string name="button_take_picture">Wer ist die Schönste im ganzen Land?</string>
+    <string name="button_try_again">Neuer Versuch</string>
+    <string name="button_alright">Weiter</string>
+    
+    <string name="resultlist_gRatio_error">Goldener Schnitt - Fehler</string>
+    <string name="resultlist_fSymmetry_error">Symmetrie - Fehler</string>
+    <string name="eye_nose_mouth">Augen - Nase - Mund</string>
+    <string name="eye_mouth_chin">Augen - Mund - Kinn</string>
+    <string name="forehead_nose_chin">Stirn - Nase - Kinn</string>
+    <string name="nose_eye_faceWidth">Nasen- Augen- Gesichtsbreite</string>
+    <string name="mouth_eyeDistance">Mund-Augen Distanz</string>
+    <string name="mouth_nose">Mund - Nase</string>
+    <string name="faceHeight_faceWidth">Gesichtslänge - Gesichtsbreite</string>
+    <string name="mouth">Mund</string>
+    <string name="nose">Nase</string>
+    <string name="eyesInside">Augen - Innen</string>
+    <string name="eyesOutside">Augen - Außen</string>
+    
+    <string name="title_setting">Einstellungen</string>
+    <string name="settings_size_title">Bildgröße</string>
+    <string name="settings_size_desc">Wähle die passende Größe für dein Gerät. Warnung: Große Bilder erfordern mehr Rechenleistung und die App könnte abstürzen.</string>
+    <string name="settings_size_value_id">image_size_id</string>
+    <string name="settings_size_value">image_size</string>
+    <string name="settings_info_title">Info</string>
+    
+    <string name="title_help">Hilf mir!</string>
+    
+    <string name="processing">Berechne &#8230;</string>
+
+</resources>

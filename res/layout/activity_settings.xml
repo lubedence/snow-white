@@ -43,56 +43,8 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical" > 
     
-        
-        
-        <RelativeLayout 
-         	android:layout_width="fill_parent"
-        	android:layout_height="wrap_content"
-        	android:layout_margin="20dp">
-            
-		        <TextView
-		            android:id="@+id/setting_ff_title"
-			        android:layout_width="fill_parent"
-			        android:layout_height="wrap_content"
-			        android:layout_alignParentTop="true"
-			        android:text="Show facial features"
-			        android:textSize="20sp"/>
-		        
-		        <TextView
-		            android:id="@+id/setting_ff_desc"
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-			        android:text="Show captured image with facial features as drawn dots on the image"
-			        android:layout_below="@id/setting_ff_title"
-		        	android:layout_alignParentLeft="true"
-		       		/>
-		        
-		        <CheckBox
-		            android:id="@+id/setting_ff_check"
-		            android:checked="true"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:paddingLeft="20dp"
-		            android:layout_below="@id/setting_ff_title"
-		       		android:layout_alignParentRight="true"
-		       		android:layout_centerVertical="true"/>    
-        </RelativeLayout>
-        
-        
-        
-        
-                
-        <View
-		    android:layout_width="fill_parent"
-		    android:layout_height="1dp"
-		    android:background="@android:color/darker_gray"/>
-        
-        
-        
-        
-        
                 <RelativeLayout 
          	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
@@ -103,14 +55,14 @@
 			        android:layout_width="fill_parent"
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
-			        android:text="Image size"
+			        android:text="@string/settings_size_title"
 			        android:textSize="20sp"/>
 		        
 		        <TextView
 		            android:id="@+id/setting_imgSize_desc"
 			        android:layout_width="wrap_content"
 			        android:layout_height="wrap_content"
-			        android:text="Choose the right image size for your phone. Warning: large images need a lot of memory and could force the app to crash."
+			        android:text="@string/settings_size_desc"
 			        android:layout_below="@id/setting_imgSize_title"
 		        	android:layout_alignParentLeft="true"
 		       		android:layout_toLeftOf="@+id/setting_imgSize_spinner"/>
@@ -137,10 +89,6 @@
 		    android:background="@android:color/darker_gray"/>
         
         
-        
-        
-
-        
         <RelativeLayout 
          	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
@@ -154,7 +102,7 @@
 			        android:layout_width="fill_parent"
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
-			        android:text="Info"
+			        android:text="@string/settings_info_title"
 			        android:textSize="20sp"/>
 
         </RelativeLayout>

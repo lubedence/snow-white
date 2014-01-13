@@ -22,17 +22,20 @@ public class PhotoHandler implements PictureCallback {
 
   private final Context context;
   private CamActivity act = null;
+  private static int IMG_SIZE;
 
   public PhotoHandler(Context context, CamActivity act) {
     this.context = context;
     this.act = act;
+    
+    IMG_SIZE = MyStoredData.getInstance().getSharedPreferences().getInt(context.getString(R.string.settings_size_value), 600);
   }
 
   @Override
   public void onPictureTaken(byte[] data, Camera camera) {
 
     	//resize
-    	Bitmap realImage = getResizedBitmap(data,600);
+    	Bitmap realImage = getResizedBitmap(data,IMG_SIZE);
     	data = null;
         
     	//rotate - mirror

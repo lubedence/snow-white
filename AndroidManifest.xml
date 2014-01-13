@@ -27,34 +27,27 @@
         </activity>
         <activity
             android:name="com.tuwien.snowwhite.CamActivity"
-            android:label="@string/title_activity_cam"
             android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.tuwien.snowwhite.StartActivity"
-            android:label="@string/title_activity_start"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name="com.tuwien.snowwhite.HelpActivity"
-            android:label="@string/title_activity_help" >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.tuwien.snowwhite.SettingsActivity"
-            android:label="@string/title_activity_settings" >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.tuwien.snowwhite.ResultActivity"
-            android:label="@string/title_activity_result" >
-        </activity>
-        <activity
-            android:name="com.tuwien.snowwhite.CelebrityActivity"
-            android:label="@string/title_activity_celebrity" >
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 

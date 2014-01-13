@@ -181,7 +181,7 @@ public class MainActivity extends Activity {
 			return;
 		
 		if (pd == null) 
-			pd = ProgressDialog.show(MainActivity.this, null, "Processing...");
+			pd = ProgressDialog.show(MainActivity.this, null, getString(R.string.processing));
 		new Thread(new Runnable() { 
 			public void run() {
 				Looper.prepare(); 

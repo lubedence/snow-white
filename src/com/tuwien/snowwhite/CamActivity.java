@@ -80,6 +80,7 @@ public class CamActivity extends Activity {
 	}
   
   public void swichCamera(View view) {
+	  Toast.makeText(this, getString(R.string.button_main_start_loading), Toast.LENGTH_SHORT).show();
 	  releaseCam();
 	  frontCamUsed = !frontCamUsed;
 	  cameraSetUp();

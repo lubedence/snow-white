@@ -62,18 +62,21 @@ public class ResultActivity extends Activity {
 		contentContainer =  ((LinearLayout)findViewById(R.id.result_content));
 		contentContainer.setVisibility(View.VISIBLE);
 		
-		addDetailRow("Golden Ratios Error", 5);
+		addDetailRow(getString(R.string.resultlist_gRatio_error), 5);
+		
 		float[] diff = ff.featureRatios();
 		String[] txt = ff.featureRatiosText();
+		
 		int count=diff.length;
 		float total = 0f;
 		float max = 0.0f;
 		float min = 100.0f;
+		
 		for (int i=0; i<diff.length; i++){
 			float tmp = diff[i];
 			if(tmp>max)
 				max = tmp;
-			else if(tmp<min)
+			if(tmp<min)
 				min = tmp;
 			total+=tmp;
 		}
@@ -92,11 +95,11 @@ public class ResultActivity extends Activity {
 				addDetailRow(txt[i],tmp,Color.GRAY);
 		}
 		
-		addDetailRow("Face Symmetry Error", 15);
+		
+		addDetailRow(getString(R.string.resultlist_fSymmetry_error), 15);
+		
 		diff = ff.checkSymmetry();
 		txt = ff.symmetryText();
-		
-		
 		max = 0.0f;
 		min = 100.0f;
 		float tmpTotal = 0;
@@ -104,7 +107,7 @@ public class ResultActivity extends Activity {
 			float tmp = diff[i];
 			if(tmp>max)
 				max = tmp;
-			else if(tmp<min)
+			if(tmp<min)
 				min = tmp;
 			total+=tmp;
 			tmpTotal+=tmp;
@@ -129,6 +132,17 @@ public class ResultActivity extends Activity {
 		result = (float)Math.round(total*10) / 10.0f;
 		
 		TextView title = (TextView)findViewById(R.id.result_title);
+		try{
+			String[] arr_smiley = this.getResources().getStringArray(R.array.smiley_categories);
+			int category = 0;
+			for(String s : arr_smiley){
+				int tmp = Integer.parseInt(s);
+				if(result >= tmp && category<=tmp)
+					category = tmp;
+			}
+			Drawable smiley = getResources().getDrawable(getResources().getIdentifier("ic_smiley_"+category, "drawable", getPackageName()));
+			title.setCompoundDrawablesWithIntrinsicBounds(null, null, smiley, null);
+		}catch(Exception e){Log.d("Smiley retrieval", e.toString());}
 		title.setText(result+"%");
 	}
 	
@@ -190,11 +204,6 @@ private void addDetailRow(String desc, int paddingTop){
 private void startCelebrities(){
 	contentContainer_cel =  ((LinearLayout)findViewById(R.id.result_content_cel));
 	
-	/*String[] celebs = getResources().getStringArray(R.array.celebrities);
-	
-	for (String c : celebs){
-		addCelRow(c,33.12334343f,"face1");
-	}*/
 	ICelebrityData celData = new CelebrityDataMock(this);
 	for (ICelebrity  c : celData.getAllCelebrities())
 		addCelRow(c.getName(),c.getScore(),c.getPicture());
@@ -215,7 +224,6 @@ private void addCelRow(String name, float score, Drawable picture){
 	params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
 	iv.setLayoutParams(params);
 	iv.setScaleType(ScaleType.CENTER_CROP);
-	//iv.setImageResource(getResources().getIdentifier(imgName, "drawable", getPackageName()));
 	iv.setImageDrawable(picture);
 	rl.addView(iv);
 	
@@ -254,10 +262,6 @@ private void addCelRow(String name, float score, Drawable picture){
 	}
 	
 	public void goCelebrities(View view){
-		/*Intent intent = new Intent(this, CelebrityActivity.class);
-	    intent.putExtra("result", result);
-	    startActivity(intent);*/
-		
 		contentContainer.setVisibility(View.GONE);
 		contentContainer_cel.setVisibility(View.VISIBLE);
 		}

@@ -1,31 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">snowwhite</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="title_activity_cam">CamActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="title_activity_start">StartActivity</string>
-    <string name="title_activity_help">HelpActivity</string>
-    <string name="title_activity_settings">SettingsActivity</string>
-    <string name="title_activity_result">ResultActivity</string>
-    <string name="settings_ff">show_ff</string>
-    <string name="title_activity_celebrity">CelebrityActivity</string>
-    
+    <string name="app_name">Snowwhite</string>
     
     <string name="button_main_start">Mirror, mirror on the wall &#8230;</string>
+    <string name="button_main_start_loading">Loading camera &#8230;</string>
     <string name="button_take_picture">Who is the fairest of them all?</string>
     <string name="button_try_again">Try again</string>
     <string name="button_alright">Alright!</string>
     
     <string name="resultlist_gRatio_error">Golden Ratios Error</string>
     <string name="resultlist_fSymmetry_error">Face Symmetry Error</string>
-    <string name="eye_nose_mouth">Eye - Nose - Mouth</string>
-    <string name="eye_mouth_chin">Eye - Mouth - Chin</string>
+    <string name="eye_nose_mouth">Eyes - Nose - Mouth</string>
+    <string name="eye_mouth_chin">Eyes - Mouth - Chin</string>
     <string name="forehead_nose_chin">Forehead - Nose - Chin</string>
-    <string name="nose_eye_faceWidth">Nose - Eye - Face width</string>
+    <string name="nose_eye_faceWidth">Nose - Eyes - Face width</string>
     <string name="mouth_eyeDistance">Mouth - Eye distance</string>
     <string name="mouth_nose">Mouth - Nose</string>
     <string name="faceHeight_faceWidth">Face height - Face widht</string>
@@ -35,7 +24,14 @@
     <string name="eyesOutside">Eyes outside</string>
     
     <string name="title_setting">Settings</string>
+    <string name="settings_size_title">Image size</string>
+    <string name="settings_size_desc">Choose the right image size for your phone. Warning: large images need a lot of memory and could force the app to crash.</string>
+    <string name="settings_size_value_id">image_size_id</string>
+    <string name="settings_size_value">image_size</string>
+    <string name="settings_info_title">Info</string>
+    
     <string name="title_help">Help me!</string>
     
-
+    <string name="processing">Processing &#8230;</string>
+    
 </resources>

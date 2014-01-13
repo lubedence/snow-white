@@ -3,8 +3,10 @@ package com.tuwien.snowwhite;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Toast;
 
 public class StartActivity extends Activity {
 
@@ -12,12 +14,12 @@ public class StartActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start);
-		
 		//init SharedPreferences
-		//MyStoredData.getInstance().Initialize(this);
+		MyStoredData.getInstance().Initialize(this);
 	}
 	
 	public void startMain(View view){
+		Toast.makeText(this, getString(R.string.button_main_start_loading), Toast.LENGTH_SHORT).show();
 	    startActivity(new Intent(this, CamActivity.class)); 
 	}
 	
