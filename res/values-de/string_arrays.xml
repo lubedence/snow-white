@@ -1,27 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-   
-    <!-- .................................................. -->
-    <!-- THE FOLLOWING TWO ARRAYS MUST HAVE THE SAME LENGTH -->
+
     <string-array name="setting_imgSize_desc">
         <item>Gering</item>
         <item>Standard</item>
         <item>Groß</item>
     </string-array>
     
-    <string-array name="setting_imgSize_values">
-        <item>400</item>
-        <item>600</item>
-        <item>1000</item>
+    <string-array name="setting_featureVis_desc">
+        <item>Punkte</item>
+        <item>Maske</item>
     </string-array>
-    <!-- .................................................. -->
     
     
-    <string-array name="celebrities">
-        <item>Justin Bieber</item>
-        <item>Angelina Jolie</item>
-        <item>Brad Pitt</item>
-        <item>Lady Gaga</item>
-        <item>Miley Cyrus</item>
-    </string-array>
 </resources>

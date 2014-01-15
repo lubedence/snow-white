@@ -26,9 +26,9 @@
     <string name="title_setting">Einstellungen</string>
     <string name="settings_size_title">Bildgröße</string>
     <string name="settings_size_desc">Wähle die passende Größe für dein Gerät. Warnung: Große Bilder erfordern mehr Rechenleistung und die App könnte abstürzen.</string>
-    <string name="settings_size_value_id">image_size_id</string>
-    <string name="settings_size_value">image_size</string>
     <string name="settings_info_title">Info</string>
+    <string name="settings_featureVis_title">Gesichtsmerkmale</string>
+    <string name="settings_featureVis_desc">Entscheide wie die Gesichtsmerkmale angezeigt werden sollen.</string>
     
     <string name="title_help">Hilf mir!</string>
     

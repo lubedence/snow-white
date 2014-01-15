@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -33,6 +34,9 @@ public class ResultActivity extends Activity {
 	
 	private LinearLayout contentContainer = null;
 	private LinearLayout contentContainer_cel = null;
+	
+	private ImageButton button_cel;
+	private ImageButton button_details;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +55,9 @@ public class ResultActivity extends Activity {
 			finish();
 		}
 		
+		button_cel = (ImageButton) findViewById(R.id.button_celebrities);
+		button_details = (ImageButton) findViewById(R.id.button_details);
+		button_details.setEnabled(false);
 		
 		startDetails();
 		startCelebrities();
@@ -262,11 +269,15 @@ private void addCelRow(String name, float score, Drawable picture){
 	}
 	
 	public void goCelebrities(View view){
+		button_cel.setEnabled(false);
+		button_details.setEnabled(true);
 		contentContainer.setVisibility(View.GONE);
 		contentContainer_cel.setVisibility(View.VISIBLE);
 		}
 	
 	public void goDetails(View view){
+		button_cel.setEnabled(true);
+		button_details.setEnabled(false);
 		contentContainer_cel.setVisibility(View.GONE);
 		contentContainer.setVisibility(View.VISIBLE);
 		}

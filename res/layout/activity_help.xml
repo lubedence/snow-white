@@ -17,14 +17,15 @@
 	   	android:paddingLeft="10dp"
 	    android:paddingRight="10dp"
 	    android:paddingTop="10dp">
-        
+
         <ImageButton
 			android:id="@+id/button_back"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:onClick="backToMain"
-			android:src="@drawable/ic_back"
-			android:background="#ffffff"
+			android:src="@drawable/button_go_back_selector"
+			android:background="@android:color/transparent"
+			style="?android:attr/borderlessButtonStyle"
 			android:paddingRight="10dp"/>
     
 	    <TextView

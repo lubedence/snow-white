@@ -14,6 +14,7 @@ import android.hardware.Camera.Size;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -57,7 +58,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         	List<Size> sizes = p.getSupportedPreviewSizes();
         	Size optimalSize = getOptimalPreviewSize(sizes, this.getWidth(), this.getHeight());
         	p.setPreviewSize(optimalSize.width, optimalSize.height);
-        	        	
+        	
         	mCamera.setParameters(p);	
         	mCamera.setDisplayOrientation(90);
             mCamera.setPreviewDisplay(mHolder);
@@ -83,7 +84,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     @Override
     public void onLayout(boolean changed, int left, int top, int right, int bottom) {
         if (changed) {
-            (this).layout(0, 0, viewWidth, viewWidth*4/3);
+            //(this).layout(0, 0, viewWidth, viewWidth*4/3);
         }
     }
 

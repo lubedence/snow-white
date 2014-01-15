@@ -23,8 +23,9 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:onClick="backToMain"
-			android:src="@drawable/ic_back"
-			android:background="#ffffff"
+			android:src="@drawable/button_go_back_selector"
+			android:background="@android:color/transparent"
+			style="?android:attr/borderlessButtonStyle"
 			android:paddingRight="10dp"/>
     
 	    <TextView
@@ -73,6 +74,41 @@
 		            android:layout_height="wrap_content"
 		            android:paddingLeft="20dp"
 		            android:layout_below="@id/setting_imgSize_title"
+		       		android:layout_alignParentRight="true"
+		       		android:layout_centerVertical="true"/>
+ 
+        </RelativeLayout>
+        
+                
+                
+                <RelativeLayout 
+         	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+        	android:layout_margin="20dp">
+            
+		        <TextView
+		            android:id="@+id/setting_featureVis_title"
+			        android:layout_width="fill_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_alignParentTop="true"
+			        android:text="@string/settings_featureVis_title"
+			        android:textSize="20sp"/>
+		        
+		        <TextView
+		            android:id="@+id/setting_featureVis_desc"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:text="@string/settings_featureVis_desc"
+			        android:layout_below="@id/setting_featureVis_title"
+		        	android:layout_alignParentLeft="true"
+		       		android:layout_toLeftOf="@+id/setting_featureVis_spinner"/>
+		        
+		        <Spinner
+				    android:id="@+id/setting_featureVis_spinner"
+				    android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:paddingLeft="20dp"
+		            android:layout_below="@id/setting_featureVis_title"
 		       		android:layout_alignParentRight="true"
 		       		android:layout_centerVertical="true"/>
  

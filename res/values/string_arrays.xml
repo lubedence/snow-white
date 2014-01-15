@@ -23,4 +23,9 @@
         <item>92</item><!-- 92 - 100   Smiley :-D -->
     </string-array>
     
+    <string-array name="setting_featureVis_desc">
+        <item>Dots</item>
+        <item>Mask</item>
+    </string-array>
+    
 </resources>

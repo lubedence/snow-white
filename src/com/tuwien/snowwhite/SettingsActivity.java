@@ -16,7 +16,8 @@ import android.widget.Spinner;
 
 public class SettingsActivity extends Activity implements OnItemSelectedListener{
 	
-	private Spinner spinner;
+	private Spinner spinner_size;
+	private Spinner spinner_vis;
 	private int[] arr_value;
 	
 	@Override
@@ -33,17 +34,28 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 			c++;
 		}
 			
-		spinner = (Spinner) findViewById(R.id.setting_imgSize_spinner);
+		spinner_size = (Spinner) findViewById(R.id.setting_imgSize_spinner);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.setting_imgSize_desc, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner.setAdapter(adapter);
-		spinner.setOnItemSelectedListener(this);
+		spinner_size.setAdapter(adapter);
+		spinner_size.setOnItemSelectedListener(this);
+		
+		
+		
+		spinner_vis = (Spinner) findViewById(R.id.setting_featureVis_spinner);
+		ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this, R.array.setting_featureVis_desc, android.R.layout.simple_spinner_item);
+		adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner_vis.setAdapter(adapter2);
+		spinner_vis.setOnItemSelectedListener(this);
+		
+		
 	}
 	
 	@Override
 	protected void onStart() {
 		super.onRestart();
-		spinner.setSelection(getImageSizeId());
+		spinner_size.setSelection(getImageSizeId());
+		spinner_vis.setSelection(getFeatureVisId());
 	}
 
 	public void backToMain(View view){
@@ -52,12 +64,28 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-		try{
-			 MyStoredData.getInstance().getEditor().putInt(getString(R.string.settings_size_value_id), pos);
-			 if(pos<arr_value.length)
-				MyStoredData.getInstance().getEditor().putInt(getString(R.string.settings_size_value), arr_value[pos]);
-			 MyStoredData.getInstance().getEditor().commit();
-		} catch(Exception e){Log.d("SAVE SETTINGS",e.toString());}
+		
+		Spinner spinner = (Spinner) parent;
+	     if(spinner.getId() == R.id.setting_featureVis_spinner)
+	     {
+	    	 try{
+				 MyStoredData.getInstance().getEditor().putInt(getString(R.string.settings_featureVis_id), pos);
+				 MyStoredData.getInstance().getEditor().commit();
+			} catch(Exception e){Log.d("SAVE SETTINGS FEATUREVIS",e.toString());}
+	     }
+	     else if(spinner.getId() == R.id.setting_imgSize_spinner)
+	     {
+	    	 try{
+				 MyStoredData.getInstance().getEditor().putInt(getString(R.string.settings_size_value_id), pos);
+				 if(pos<arr_value.length)
+					MyStoredData.getInstance().getEditor().putInt(getString(R.string.settings_size_value), arr_value[pos]);
+				 MyStoredData.getInstance().getEditor().commit();
+			} catch(Exception e){Log.d("SAVE SETTINGS IMGSIZE",e.toString());}
+	     }
+		
+		
+		
+		
 	}
 	
 	
@@ -65,7 +93,9 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 			return MyStoredData.getInstance().getSharedPreferences().getInt(getString(R.string.settings_size_value_id), (int)Math.floor(arr_value.length / 2));
 	}
 	
-
+	private int getFeatureVisId(){
+		return MyStoredData.getInstance().getSharedPreferences().getInt(getString(R.string.settings_featureVis_id), 0);
+}
 
 	@Override
 	public void onNothingSelected(AdapterView<?> arg0) {

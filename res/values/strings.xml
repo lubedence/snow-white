@@ -28,7 +28,10 @@
     <string name="settings_size_desc">Choose the right image size for your phone. Warning: large images need a lot of memory and could force the app to crash.</string>
     <string name="settings_size_value_id">image_size_id</string>
     <string name="settings_size_value">image_size</string>
+    <string name="settings_featureVis_id">image_featureVis_id</string>
     <string name="settings_info_title">Info</string>
+    <string name="settings_featureVis_title">Feature Visualization</string>
+    <string name="settings_featureVis_desc">Select how to visualize the facial features.</string>
     
     <string name="title_help">Help me!</string>
     
