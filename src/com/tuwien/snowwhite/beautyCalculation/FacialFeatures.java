@@ -76,10 +76,10 @@ public class FacialFeatures {
 		
 		//HORIZONTAL---------------------------------------------------------------
 		
-		//nose/eye/face-width in relation
-		int nose_width = noseWidth();//1.00
-		int eyes_outer_dist = eyesOuterDistance();//phi^2
-		int face_width = faceWidth();//phi^3
+		//nose,eye,face-width in relation
+		int nose_width = noseWidth();//should be 1.00
+		int eyes_outer_dist = eyesOuterDistance();//should be phi^2
+		int face_width = faceWidth();//should be phi^3
 		float a = oneToOneRatio(nose_width*GOLDENRATIO*GOLDENRATIO, eyes_outer_dist);
 		float b = oneToOneRatio(nose_width*GOLDENRATIO*GOLDENRATIO*GOLDENRATIO, face_width);
 		float c = oneToOneRatio(eyes_outer_dist*GOLDENRATIO, face_width);
@@ -93,11 +93,8 @@ public class FacialFeatures {
 		//mouth width - nose width
 		deviation[5] = goldenRatio(mouthWidth(), noseWidth());
 		ratioText[5] = context.getString(R.string.mouth_nose);
-		
-		//eyes width should be equal
-		//deviation[6] = oneToOneRatio(eyeLeftWidth(), eyeRightWidth());
-		
-		//BOTH---------------------------------------------------------------------
+				
+		//HORIZONTAL AND VERTICAL--------------------------------------------------
 		
 		//face height - face width
 		deviation[6] = goldenRatio(faceHeight(), faceWidth());
@@ -107,14 +104,16 @@ public class FacialFeatures {
 		
 	}
 	
-	//distance a-c
-	//b should be the golden ratio of the distance a-c
+	//distance A to C
+	//B should be the golden ratio of the distance A to C
 	//return: deviation in percentage
 	private float goldenRatio(int a, int b, int c){
 		return goldenRatio(Math.abs(a-b), Math.abs(c-b));
 	}
 	
-	//distAB+distBC == distance from A to C
+	//distAB+distBC= distance A to C
+	//B should be the golden ratio of the distance A to C
+	//return: deviation in percentage
 	private float goldenRatio(float distAB, float distBC){
 		float ratio = 0;
 		
@@ -128,6 +127,7 @@ public class FacialFeatures {
 		else			return percent;
 	}
 	
+	//return: decviation of distA to distB in percentage
 	private float oneToOneRatio(float distA, float distB){
 		float percent = 0;
 		if(distA<distB)		percent = Math.abs((distA/distB)-1)*100;
@@ -137,18 +137,20 @@ public class FacialFeatures {
 		else return percent;
 	}
 	
+	//symmetry of mouth, nose and eyes
+	//symmetry line goes from FACE_TOP to FACE_BOTTOM
 	public float[] checkSymmetry(){
-		//line from face top (or nose center? cause, face top X could be not that accurate) to face bottom -> A
-		//for ex.: line from mouth left to right -> B
-		//calc intersection point of A and B
+		//example
+		//symmetry line -> X
+		//line from mouth left to right -> Y
+		//calculate intersection point of X and Y
 		//both part lines(B1 and B2) should have the same length
-		//TODO: check if right angle between A and B ?
+		//TODO ideally, there should be a right angle between X and Y
 		
 		float[] deviation = new float[4];
 		symmetryText = new String[4];
 		
-		//vertical symmetry-line 
-		//C1 = A1x+B1y
+		//vertical symmetry-line. C1 = A1*x+B1*y
 		int A1 = points[PN.FACE_BOTTOM].y - points[PN.FACE_TOP].y;
 		int B1 = points[PN.FACE_TOP].x - points[PN.FACE_BOTTOM].x;
 		int C1 = A1*points[PN.FACE_TOP].x+B1*points[PN.FACE_TOP].y;
@@ -211,7 +213,7 @@ public class FacialFeatures {
 		float C2 = A2*start[0]+B2*start[1];
 		
 		float det = A1*B2 - A2*B1;
-		if(det == 0.0f) return null; //should never happen
+		if(det == 0.0f) return null; //parallel lines
 		
 		float[] intP = new float[2];
 		

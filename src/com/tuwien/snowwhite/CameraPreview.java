@@ -16,6 +16,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 /** A basic Camera preview class */
@@ -23,7 +24,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder mHolder;
     private Camera mCamera;
     private String TAG = "CameraPreview";
-    private int viewWidth = 640;
+    private int viewWidth;
     private boolean previewIsRunning = false;
 
     public CameraPreview(Context context, Camera camera) {
@@ -58,7 +59,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         	List<Size> sizes = p.getSupportedPreviewSizes();
         	Size optimalSize = getOptimalPreviewSize(sizes, this.getWidth(), this.getHeight());
         	p.setPreviewSize(optimalSize.width, optimalSize.height);
-        	
+
+        	this.setLayoutParams(new FrameLayout.LayoutParams(viewWidth,Math.round(viewWidth*((float)optimalSize.width/optimalSize.height))));
         	mCamera.setParameters(p);	
         	mCamera.setDisplayOrientation(90);
             mCamera.setPreviewDisplay(mHolder);

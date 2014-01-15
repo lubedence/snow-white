@@ -15,7 +15,6 @@ public class SampleView extends ImageView {
 	
     private Bitmap bm;
     private Paint  rPaint;
-    private Paint  bPaint;
     private boolean drawMark = false;
     
     private int featureVisType = 0;
@@ -27,10 +26,6 @@ public class SampleView extends ImageView {
         rPaint = new Paint();
         rPaint.setColor(Color.RED);
         rPaint.setStyle(Paint.Style.STROKE);
-        
-        bPaint = new Paint();
-        bPaint.setColor(Color.BLUE);
-        bPaint.setStyle(Paint.Style.STROKE);  
         
         //visualization type: dots(0) or mask(1)
         featureVisType = MyStoredData.getInstance().getSharedPreferences().getInt(context.getString(R.string.settings_featureVis_id), 0);

@@ -1,7 +1,5 @@
 package com.tuwien.snowwhite;
 
-import org.opencv.android.OpenCVLoader;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,7 +12,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -170,7 +167,7 @@ public class CamActivity extends Activity {
 
 	  releaseCam();
 	  
-      Intent intent = new Intent(this, MainActivity.class);
+      Intent intent = new Intent(this, FacialFeatureActivity.class);
       intent.putExtra("imgFile", imgPath);
       Log.d("CamActivity","START NEXT ACTIVITY");
       startActivity(intent); 

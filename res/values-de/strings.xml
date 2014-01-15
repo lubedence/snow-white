@@ -33,5 +33,8 @@
     <string name="title_help">Hilf mir!</string>
     
     <string name="processing">Berechne &#8230;</string>
+    <string name="stasm_error_loading">Bild kann nicht geöffnet werden!</string>
+    <string name="stasm_error_processing">Fehler während Gesichtserkennung!</string>
+    <string name="stasm_error_finding">Gesichtserkennung fehlgeschlagen!</string>
 
 </resources>

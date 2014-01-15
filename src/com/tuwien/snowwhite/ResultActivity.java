@@ -44,8 +44,8 @@ public class ResultActivity extends Activity {
 		setContentView(R.layout.activity_result);
 		
 		Intent intent = getIntent();
-		imgPath = intent.getStringExtra(MainActivity.IMAGEPATH);
-		facialData = intent.getIntArrayExtra(MainActivity.FEATUREARRAY);
+		imgPath = intent.getStringExtra(FacialFeatureActivity.IMAGEPATH);
+		facialData = intent.getIntArrayExtra(FacialFeatureActivity.FEATUREARRAY);
 		
 		try {
 			ff = new FacialFeatures(facialData,this);

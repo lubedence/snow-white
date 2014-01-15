@@ -14,8 +14,8 @@ public class StartActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start);
-		//init SharedPreferences
-		MyStoredData.getInstance().Initialize(this);
+		
+		MyStoredData.getInstance().Initialize(this); //init SharedPreferences
 	}
 	
 	public void startMain(View view){

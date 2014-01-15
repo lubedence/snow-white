@@ -36,5 +36,8 @@
     <string name="title_help">Help me!</string>
     
     <string name="processing">Processing &#8230;</string>
+    <string name="stasm_error_loading">Cannot load image!</string>
+    <string name="stasm_error_processing">Error in processing image!</string>
+    <string name="stasm_error_finding">No face found in this image!</string>
     
 </resources>

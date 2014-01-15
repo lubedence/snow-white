@@ -16,6 +16,7 @@ import android.transition.Visibility;
 import android.util.*;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.os.Handler;
 import android.os.Message;
 import android.content.Context;
@@ -29,8 +30,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.os.Looper;
 
-public class MainActivity extends Activity {	   
-	private final String TAG = "StasmAndroidDemo";
+public class FacialFeatureActivity extends Activity {	   
+	private static String TAG = "FacialFeatureActivity";
 	private static final int CALCULATION_SUCCESFUL = 0x101;
 	private static final int CALCULATION_ERROR = 0x102;
 	private boolean debug = true;
@@ -60,7 +61,7 @@ public class MainActivity extends Activity {
   	public static String IMAGEPATH = "imgpath";
   	public static String FEATUREARRAY = "featurearray";
   		
-    public native int[] FindFaceLandmarks(float ratioW, float ratioH, String path);
+    public native int[] FindFaceLandmarks(String path);
     
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -68,9 +69,7 @@ public class MainActivity extends Activity {
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS:
                     if (debug) Log.e(TAG, "OpenCV loaded successfully");
-                    // Load native library after(!) OpenCV initialization
                     System.loadLibrary("native_sample");
-                    sv.setEnabled(true);
                     processing();
                     break;
                 default:
@@ -117,12 +116,12 @@ public class MainActivity extends Activity {
     	// @Override 
     	public void handleMessage(Message msg) { 
     		switch (msg.what) { 
-    			case MainActivity.CALCULATION_SUCCESFUL:
+    			case FacialFeatureActivity.CALCULATION_SUCCESFUL:
     				sv.invalidate();
     				calculationComplete = true;
     				((Button) findViewById(R.id.button_next)).setVisibility(View.VISIBLE);
     				try {pd.dismiss(); pd = null;} catch (Exception e){}
-    			case MainActivity.CALCULATION_ERROR:
+    			case FacialFeatureActivity.CALCULATION_ERROR:
     				sv.invalidate();
     				calculationComplete = true;
     				try {pd.dismiss(); pd = null;} catch (Exception e){}
@@ -135,25 +134,28 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_facial_feature);
 		
-		//GET IMG FILE
+		//get image file path
 		Intent intent = getIntent();
 		imgPath = intent.getStringExtra("imgFile");
 		
-		Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay(); 
-		int ori = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getOrientation();
-		screenWW = display.getWidth();
-		screenHH = display.getHeight();		
-		if (debug) Log.e(getString(R.string.app_name), ori+" screenWW="+display.getWidth()+" screenHH="+display.getHeight());
+		//display size
+		Point outSize = new Point();
+		((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getSize(outSize);; 
+		screenWW = outSize.x;
+		screenHH = outSize.y;	
 		
-        if (!isDataFileInLocalDir(MainActivity.this)) {
-        	putDataFileInLocalDir(MainActivity.this, R.raw.haarcascade_frontalface_alt2, f_frontalface);
-        	putDataFileInLocalDir(MainActivity.this, R.raw.haarcascade_mcs_lefteye, f_lefteye);
-        	putDataFileInLocalDir(MainActivity.this, R.raw.haarcascade_mcs_righteye, f_righteye);
+		//put face detection files for stasm-lib in local directory
+        if (!isDataFileInLocalDir(FacialFeatureActivity.this)) {
+        	putDataFileInLocalDir(FacialFeatureActivity.this, R.raw.haarcascade_frontalface_alt2, f_frontalface);
+        	putDataFileInLocalDir(FacialFeatureActivity.this, R.raw.haarcascade_mcs_lefteye, f_lefteye);
+        	putDataFileInLocalDir(FacialFeatureActivity.this, R.raw.haarcascade_mcs_righteye, f_righteye);
         }
         
+        //this view displays image and facial features
         sv = (SampleView) findViewById(R.id.sv);
+        
 		Initialize();      
 	}
     
@@ -161,7 +163,6 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
     	if(sv != null){
     		sv.clearBitmap();
-    		sv = null;
     	}
     	if(mImage != null){
     		mImage.recycle();
@@ -177,37 +178,40 @@ public class MainActivity extends Activity {
     }
 		
 	private void processing() {
+		//already processed (if onResume is called after processing)
 		if(calculationComplete)
 			return;
 		
+		//create progress dialog
 		if (pd == null) 
-			pd = ProgressDialog.show(MainActivity.this, null, getString(R.string.processing));
+			pd = ProgressDialog.show(this, null, getString(R.string.processing));
+		
 		new Thread(new Runnable() { 
 			public void run() {
 				Looper.prepare(); 
 				
 				Message m = new Message();
-				m.what = MainActivity.CALCULATION_ERROR;
+				m.what = FacialFeatureActivity.CALCULATION_ERROR;
 				
-				if (mImage != null) {				
-					points = FindFaceLandmarks(ratioW, ratioH, imgPath);
+				if (mImage != null) {		
+					//call native function and calculate facial features 
+					points = FindFaceLandmarks(imgPath);
 
-					if (debug) Log.e(TAG, ""+points.length);
 					//handle possible error
 					if ((points[0] == -1) && (points[1] == -1)) {
-						Toast.makeText(MainActivity.this, "Cannot load image file ~~~/face.jpg", Toast.LENGTH_LONG).show();
+						Toast.makeText(FacialFeatureActivity.this, getString(R.string.stasm_error_loading), Toast.LENGTH_LONG).show();
 					} else if ((points[0] == -2) && (points[1] == -2)) {
-						Toast.makeText(MainActivity.this, "Error in stasm_search_single!", Toast.LENGTH_LONG).show();
+						Toast.makeText(FacialFeatureActivity.this, getString(R.string.stasm_error_processing), Toast.LENGTH_LONG).show();
 					} else if ((points[0] == -3) && (points[1] == -3)) {
-						Toast.makeText(MainActivity.this, "No face found in ~~~/face.jpg", Toast.LENGTH_LONG).show();	
+						Toast.makeText(FacialFeatureActivity.this, getString(R.string.stasm_error_finding), Toast.LENGTH_LONG).show();	
 						sv.setBM(mImage);
 					} else {
-						sv.setBM(mImage, points);
-						m.what = MainActivity.CALCULATION_SUCCESFUL;
+						sv.setBM(mImage, points, ratioW, ratioH);
+						m.what = FacialFeatureActivity.CALCULATION_SUCCESFUL;
 					}
 				}
 
-				MainActivity.this.myViewUpdateHandler.sendMessage(m);
+				FacialFeatureActivity.this.myViewUpdateHandler.sendMessage(m);
 				Looper.loop();
 			}
 		}).start();
@@ -217,7 +221,6 @@ public class MainActivity extends Activity {
 	public void goBack(View view){
 		if(sv != null){
     		sv.clearBitmap();
-    		sv = null;
     	}
     	if(mImage != null){
     		mImage.recycle();
@@ -235,33 +238,30 @@ public class MainActivity extends Activity {
     
 	void Initialize() {
 		try {
-			//Bitmap temp = BitmapFactory.decodeResource(getResources(), R.drawable.face);
+			//get image as Bitmap
 			Bitmap temp = BitmapFactory.decodeFile(imgPath);
-			//Bitmap temp = PhotoHandler.getResizedBitmap(imgPath, 1200);
-			if (debug) Log.e(TAG, "Original Image: "+temp.getWidth()+"X"+ temp.getHeight());
-				
+			
+			//scale image to display with calculated facial features on screen
 			int finalImgWidth  = screenWW;
-			int finalImgHeight = (temp.getHeight() * finalImgWidth )/temp.getWidth();
+			int finalImgHeight = temp.getHeight() * finalImgWidth / temp.getWidth();
 			mImage = Bitmap.createScaledBitmap(temp, finalImgWidth, finalImgHeight, true);
 			mWidth = mImage.getWidth();
 			mHeight= mImage.getHeight();
 			ratioW = (float)mWidth/temp.getWidth();
 			ratioH = (float)mHeight/temp.getHeight();
-			if (debug) Log.e(TAG, "Scaled Image: "+ mWidth+"X"+mHeight+" "+ratioW+" "+ratioH);
-			
-			sv = (SampleView) findViewById(R.id.sv);
-			
-			Toast.makeText(MainActivity.this, "W&H:"+finalImgWidth+"-"+finalImgHeight, Toast.LENGTH_LONG).show();
-
-			sv.setBM(mImage);
-			sv.invalidate();
 			temp.recycle();
 			temp = null;
+			
+			if (debug) Log.e(TAG, "Scaled Image: "+ mWidth+"X"+mHeight+" "+ratioW+" "+ratioH);
+
+			//show image on screen (no facial features yet)
+			sv.setBM(mImage);
+			sv.invalidate();
 		} catch (Exception e) {
-			Toast.makeText(MainActivity.this, "EXCEPTION", Toast.LENGTH_LONG).show();
-			if (debug) Log.e(TAG, "Initialize():"+e.toString());
+			Toast.makeText(this, "Error on initialization", Toast.LENGTH_LONG).show();
+			if (debug) Log.e(TAG, "On Initialize:"+e.toString());
 		} catch (OutOfMemoryError oe) {
-			Toast.makeText(MainActivity.this, "OUT OF MEMORY", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "Not enough memory", Toast.LENGTH_LONG).show();
 		}
 	}
 }
