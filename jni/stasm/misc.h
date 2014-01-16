@@ -12,6 +12,7 @@ using std::vector;
 using std::string;
 
 typedef vector<int>      vec_int;
+typedef vector<bool>     vec_bool;
 typedef vector<double>   vec_double;
 typedef vector<cv::Rect> vec_Rect;
 
@@ -24,7 +25,7 @@ typedef cv::Mat_<double> Shape; // by convention an N x 2 matrix holding a shape
 
 typedef cv::Mat_<byte> Image;   // a gray image (a matrix of bytes)
 
-typedef cv::Vec3b RGBV;         // a vec of three bytes: red(0), green, and blue(2)
+typedef cv::Vec3b RGBV;         // a vec of three bytes: red(0), green(1), and blue(2)
 
 typedef cv::Mat_<RGBV> CImage;  // an RGB image (for apps and debugging, unneeded for ASM)
 
@@ -43,6 +44,12 @@ static const int SBIG = 10000;  // long string length, enough for big printfs
 #define _MAX_FNAME  256 /* max. length of file name component */
 #define _MAX_EXT    256 /* max. length of extension component */
 #endif
+
+// colors
+static const unsigned C_RED    = 0xff0000;
+static const unsigned C_GREEN  = 0x00ff00;
+static const unsigned C_BLUE   = 0x0000ff;
+static const unsigned C_YELLOW = 0xffff00;
 
 // Secure form of strcpy and friends (prevent buffer overrun).
 // The CV_DbgAssert catches an easy programming error where
@@ -135,11 +142,11 @@ template <typename T> T ABS(const T x)           // define ABS(x)
 
 template <typename T> T Clamp(const T x, const T min, const T max)
 {
-    return MIN(MAX(x, min), max);
+    return MIN(MAX(x, min), max); // force x to a value between min and max
 }
 
 // Equal() returns true if x == y within reasonable tolerance.
-// The 1e-7 is arbitrary but approximately equals FLT_EPSILON.
+// The default tolerance 1e-7 is arbitrary but approximately equals FLT_EPSILON.
 // (If one or both of the numbers are NANs then the test fails, even if
 // they are equal NANs.  Which is not necessarily desireable behaviour.)
 
@@ -255,6 +262,25 @@ static inline double PointDist(
                      shape(ipoint2, IX), shape(ipoint2, IY));
 }
 
+static inline double SumElems(
+    const MAT &mat)
+{
+    return double(cv::sum(mat)[0]);
+}
+
+// Generate the width used (in for example %2.2d) for printfs of landmark numbers
+//
+// For npoints 0..9    return 1
+//     npoints 10..99  return 2
+//     npoints 100.999 return 3
+//     etc.
+
+static inline int NumDigits(
+    const double npoints)
+{
+    return MAX(1, int(floor(log10(npoints))+1));
+}
+
 // note: in frontal-model-only Stasm, the only valid value for EYAW is EYAW00
 
 enum EYAW
@@ -275,16 +301,16 @@ enum ESTART // do we use the detected eyes or mouth to help position the startsh
 };
 
 #if MOD_3 || MOD_A || MOD_A_EMU // experimental versions
-static double EYAW_TO_USE_DET22 = 14; // what estimated yaw requires the yaw22 mod
-static double EYAW_TO_USE_DET45 = 35; // ditto for yaw45 model
+static const double EYAW_TO_USE_DET22 = 14; // what estimated yaw requires the yaw22 mod
+static const double EYAW_TO_USE_DET45 = 35; // ditto for yaw45 model
 #endif
 
-struct DetPar // the structure describing a face detection
+struct DetPar              // face and feature detector parameters
 {
     double x, y;           // center of detector shape
     double width, height;  // width and height of detector shape
-    double lex, ley;       // center of left eye, left and right are wrt the viewer
-    double rex, rey;       // ditto for right eye
+    double lex, ley;       // center of left eye (left and right are wrt the viewer)
+    double rex, rey;       // center of right eye
     double mouthx, mouthy; // center of mouth
     double rot;            // in-plane rotation
     double yaw;            // yaw
@@ -328,11 +354,18 @@ void makepath(
 
 void LogShape(const MAT& mat, const char* matname);
 
+void PrintMat(const MAT&  mat, const char* msg); // utility to print a matrix
+
+#define PRINTMAT(mat) PrintMat(mat, #mat) // utility to print an matrix and its name
+
 MAT DimKeep(const MAT& mat, int nrows, int ncols);
 
 const MAT ArrayAsMat(int ncols, int nrows, const double* data);
 
-void RoundMat(MAT& mat); // round mat entries to integers
+MAT RoundMat(             // return mat with entries rounded to integers
+    const MAT& mat);      // in
+
+void JitterPointsAt00InPlace(Shape& shape);
 
 Shape JitterPointsAt00(const Shape& shape);
 
@@ -340,7 +373,7 @@ double ForcePinnedPoints( // force pinned landmarks in shape to their pinned pos
     Shape&      shape,        // io
     const Shape pinnedshape); // in
 
-void ShapeMinMax(
+void ShapeMinMax(        // get min and max ccords in the given shape
     double&      xmin,   // out
     double&      xmax,   // out
     double&      ymin,   // out
@@ -351,20 +384,20 @@ double ShapeWidth(const Shape& shape);  // width of shape in pixels
 
 double ShapeHeight(const Shape& shape); // height of shape in pixels
 
-void AlignShapeInPlace(               // affine transform of shape
+void TransformShapeInPlace(           // affine transform of shape
     Shape&     shape,                 // io
     const MAT& alignment_mat);        // in
 
-void AlignShapeInPlace(               // affine transform of shape
+void TransformShapeInPlace(           // affine transform of shape
     Shape& shape,                     // io
     double x0, double y0, double z0,  // in
     double x1, double y1, double z1); // in
 
-Shape AlignShape(                     // return transformed shape, affine transform
+Shape TransformShape(                 // return transformed shape, affine transform
     const Shape& shape,               // in
     const MAT&   alignment_mat);      // in
 
-Shape AlignShape(                     // return transformed shape, affine transform
+Shape TransformShape(                 // return transformed shape, affine transform
     const Shape& shape,               // in
     double x0, double y0, double z0,  // in
     double x1, double y1, double z1); // in
@@ -373,6 +406,18 @@ const MAT AlignmentMat(          // return similarity transf to align shape to a
     const Shape&  shape,         // in
     const Shape&  anchorshape,   // in
     const double* weights=NULL); // in: if NULL (default) all points equal weight
+
+Shape ShiftShape( // add xshift and yshift to shape coords, skipping unused points
+    const Shape& shape,    // in
+    int          xshift,   // in
+    int          yshift);  // in
+
+Shape ShiftShape(          // like above but shifts are doubles not ints
+    const Shape& shape,    // in
+    double       xshift,   // in
+    double       yshift);  // in
+
+CvScalar ToCvColor(unsigned color);
 
 void DrawShape(                   // draw a shape on an image
     CImage&      img,             // io
@@ -391,7 +436,10 @@ void ImgPrintf(                   // printf on image
     ...);                         // in
 
 void DesaturateImg(
-    CImage& img);       // io: convert to gray (but still an RGB image)
+    CImage& img);                 // io: convert to gray (but still an RGB image)
+
+void DarkenImg(
+    CImage& img);                 // io: darken this image
 
 void ForceRectIntoImg(  // force rectangle into image
     int&         ix,    // io
@@ -415,17 +463,17 @@ void OpenDetector( // open face or feature detector from its XML file
 
 vec_Rect Detect(                             // detect faces or facial features
     const Image&           img,              // in
-    cv::CascadeClassifier* cascade,          // in
+    cv::CascadeClassifier& cascade,          // in
     const Rect*            searchrect,       // in: search in this region, can be NULL
     double                 scale_factor,     // in
     int                    min_neighbors,    // in
     int                    flags,            // in
     int                    minwidth_pixels); // in: reduces false positives
 
+bool IsLeftFacing(EYAW eyaw);   // true if eyaw is for a left facing face
+
 // TODO Following commented out to avoid circular dependency.
 // int EyawAsModIndex(EYAW eyaw, const vec_Mod& mods);
-
-bool IsLeftFacing(EYAW eyaw);   // true if eyaw is for a left facing face
 
 EYAW DegreesAsEyaw( // this determines what model is best for a given yaw
     double yaw,     // in: yaw in degrees, negative if left facing
@@ -433,9 +481,23 @@ EYAW DegreesAsEyaw( // this determines what model is best for a given yaw
 
 const char* EyawAsString(EYAW eyaw);
 
+unsigned EyawAsColor(EYAW eyaw);
+
 DetPar FlipDetPar(           // mirror image of detpar
     const DetPar& detpar,    // in
     int           imgwidth); // in
+
+bool InRect(                 // is the center of rect within the enclosing rect?
+    const Rect& rect,        // in
+    const Rect& enclosing);  // in
+
+bool InRect(      // is x,y within the enclosing rect?
+    double x,     // in
+    double y,     // in
+    double left,  // in
+    double top,   // in
+    double right, // in
+    double bot);  // in
 
 } // namespace stasm
 #endif // STASM_MISC_H

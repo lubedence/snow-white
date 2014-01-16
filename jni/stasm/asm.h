@@ -52,8 +52,14 @@ private:
         const BaseDescMod** const descmods_arg, // in: descriptor models
         int                       ndescmods)    // in: sanity check
     {
-        CV_Assert(ndescmods == stasm_NLANDMARKS * N_PYR_LEVS);
-
+        if (stasm_NLANDMARKS != ndescmods / N_PYR_LEVS) // sanity check
+        {
+            Err("stasm_NLANDMARKS != ndescmods / N_PYR_LEVS\n\n"
+                "    stasm_NLANDMARKS %d\n    ndescmods / N_PYR_LEVS %d\n"
+                "    ndescmods %d\n    N_PYR_LEVS %d",
+                stasm_NLANDMARKS, ndescmods / N_PYR_LEVS,
+                ndescmods, N_PYR_LEVS);
+        }
         vec_vec_BaseDescMod descmods(N_PYR_LEVS);
 
         for (int ilev = 0; ilev < N_PYR_LEVS; ilev++)
@@ -87,6 +93,7 @@ public:
     {
         CV_Assert(eyaw == EYAW_45 || eyaw == EYAW_22 || eyaw == EYAW00 ||
                   eyaw == EYAW22  || eyaw == EYAW45);
+
         CV_Assert(estart == ESTART_RECT_ONLY || estart == ESTART_EYES ||
                   estart == ESTART_EYE_AND_MOUTH);
     }

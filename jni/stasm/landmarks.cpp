@@ -25,6 +25,9 @@ void PrevAndNextLandmarks(
 
     const LANDMARK_INFO* const info = LANDMARK_INFO_TAB;
 
+    CV_Assert(NELEMS(LANDMARK_INFO_TAB) == npoints);
+    CV_Assert(ipoint >= 0 && ipoint < npoints);
+
     prev = info[ipoint].prev;
     if (prev < 0) // not specified in table?
         prev = (ipoint + npoints - 1) % npoints;
@@ -35,6 +38,8 @@ void PrevAndNextLandmarks(
 
     CV_Assert(prev >= 0);
     CV_Assert(next >= 0);
+    CV_Assert(prev < int(shape.rows));
+    CV_Assert(next < int(shape.rows));
     CV_Assert(prev != next);
     CV_Assert(PointUsed(shape, prev));
     CV_Assert(PointUsed(shape, next));
@@ -59,19 +64,24 @@ static void FlipPoint(
 }
 
 // Flip shape horizontally.
-// Needed so we can use right facing  models for left facing faces.
+// Needed so we can use right facing models for left facing faces.
 
-Shape FlipShape(
+Shape FlipShape(           // flip shape horizontally
     const Shape& shape,    // in
     int          imgwidth) // in
 {
-    const LANDMARK_INFO* info = LANDMARK_INFO_TAB;
+    const LANDMARK_INFO* info;
+    switch (shape.rows)
+    {
+    case 77: info = LANDMARK_INFO_TAB; break;
+    default: Err("Do not know how to mirror a %d shape", shape.rows);
+    }
     Shape outshape(shape.rows, 2);
     for (int i = 0; i < shape.rows; i++)
     {
         int partner = info[i].partner;
 
-        if (partner == -1) // e.g. tip of nose
+        if (partner == -1) // no partner e.g. tip of nose
             partner = i;
 
         FlipPoint(outshape, shape, partner, i, imgwidth);

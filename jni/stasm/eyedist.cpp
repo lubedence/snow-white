@@ -28,11 +28,8 @@ static int TabPoint(    // return first used point in tab, -1 if none
     return -1;
 }
 
-// TODO Use center of mouth rather than bottom of bottom lip
-//      --- but then would have to to retrain the ASM models.
-
 static double CanonicalEyeMouthDist( // return 0 if pupils and mouth not avail
-    const Shape& shape17) // in
+    const Shape& shape17)            // in
 {
     if (!PointUsed(shape17, L17_LPupil) ||
         !PointUsed(shape17, L17_RPupil) ||
@@ -47,7 +44,7 @@ static double CanonicalEyeMouthDist( // return 0 if pupils and mouth not avail
              shape17(L17_CBotOfBotLip, IY));
 }
 
-double EyeMouthDist(    // eye-mouth distance of a face shape
+double EyeMouthDist(    // eye-mouth distance of a face shape, return 1 if not a face
     const Shape& shape) // in
 {
     static const int eyes[] = // surrogates for pupil midpoint
@@ -70,7 +67,9 @@ double EyeMouthDist(    // eye-mouth distance of a face shape
         L17_LMouthCorner,
         L17_RMouthCorner
     };
-    const Shape shape17(shape.rows == 17? shape: Shape17(shape));
+    const Shape shape17(Shape17OrEmpty(shape));
+    if (shape17.rows == 0)            // could not convert the shape to a Shape17?
+        return ShapeWidth(shape) / 2; // fallback, note return
     double eyemouth = CanonicalEyeMouthDist(shape17);
     if (eyemouth == 0) // pupils and mouth not available?
     {
@@ -113,11 +112,14 @@ double InterEyeDist(    // inter-pupil distance of a face shape
         L17_REyebrowInner,
         L17_REyebrowOuter
     };
+    const Shape shape17(Shape17OrEmpty(shape));
+    if (shape17.rows == 0)            // could not convert the shape to a Shape17?
+        return ShapeWidth(shape) / 2; // fallback, note return
     double eyedist = 0;
-    const Shape shape17(Shape17(shape));
     const int leye = TabPoint(leyes, NELEMS(leyes), shape17);
     const int reye = TabPoint(reyes, NELEMS(reyes), shape17);
-    if (leye >= 0 && reye >= 0) // actual or surrogate points available?
+    if (leye >= 0 && reye >= 0 &&           // actual or surrogate points available?
+        PointDist(shape17, leye, reye) > 1) // surrogates aren't co-located?
     {
         eyedist = PointDist(shape17, leye, reye) *
                   PointDist(MEANSHAPE17, L17_LPupil, L17_RPupil) /

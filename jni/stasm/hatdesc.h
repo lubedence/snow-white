@@ -27,14 +27,18 @@ static const int HAT_START_LEV = 2;    // HAT descriptors are for pyr levs 0...2
 // define HatFit: a pointer to a func for measuring fit of HAT descriptor
 typedef double(*HatFit)(const double* const);
 
-extern void InitHatLevData( // init the global HAT data needed for this pyr level
-    const Image& img,       // in
-    int          ilev);     // in: pyramid level, 0 is full size
+void InitHatLevData(      // init the global HAT data needed for this pyr level
+    const Image& img,     // in
+    int          ilev);   // in: pyramid level, 0 is full size
 
-extern void HatDescSearch(  // search in a grid around the current landmark
-    double&      x,         // io: (in: old posn of landmark, out: new posn)
-    double&      y,         // io
-    const HatFit hatfit);   // in: func to estimate descriptor match
+VEC HatDesc(              // used only during training new models
+    double x,             // in
+    double y);            // in
+
+void HatDescSearch(       // search in a grid around the current landmark
+    double&      x,       // io: (in: old posn of landmark, out: new posn)
+    double&      y,       // io
+    const HatFit hatfit); // in: func to estimate descriptor match
 
 class HatDescMod: public BaseDescMod
 {

@@ -1,4 +1,4 @@
-// stasm_landmarks.h: define the Stasm landmarks
+// stasm_landmarks.h: define the Stasm landmarks for the 77 point model
 //
 // Copyright (C) 2005-2013, Stephen Milborrow
 

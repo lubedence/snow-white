@@ -39,7 +39,9 @@ public:
           bmax_(bmax),
           hackbits_(hackbits)
     {
-        CV_Assert(meanshape.rows == stasm_NLANDMARKS);
+        if (meanshape.rows != stasm_NLANDMARKS)
+            Err("meanshape.rows %d != stasm_NLANDMARKS %d",
+                meanshape.rows, stasm_NLANDMARKS);
         CV_Assert(meanshape.cols == 2);
         CV_Assert(NSIZE(eigvals) == 2 * stasm_NLANDMARKS);
         CV_Assert(eigvecs.rows   == 2 * stasm_NLANDMARKS);
@@ -62,6 +64,18 @@ private:
     DISALLOW_COPY_AND_ASSIGN(ShapeMod);
 
 }; // end class ShapeMod
+
+VEC PointWeights(void); // return point weights from LANDMARK_INFO_TAB
+
+Shape ConformShapeToMod( // Return a copy of inshape conformed to the model
+    VEC&         b,             // io: eigvec weights
+    const Shape& inshape,       // in: the current position of the landmarks
+    const Shape& meanshape,     // in: n x 2
+    const VEC&   eigvals,       // in: neigs x 1
+    const MAT&   eigvecs,       // in: 2n x neigs
+    const MAT&   eigvecsi,      // in: neigs x 2n, inverse of eigvecs
+    const double bmax,          // in: for LimitB
+    const VEC&   pointweights); // in: contribution of each point to the pose
 
 } // namespace stasm
 #endif // STASM_SHAPEMODEL_H

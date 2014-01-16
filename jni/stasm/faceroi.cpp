@@ -90,9 +90,9 @@ static DetPar ImgDetParToRoiFrame(
     {
         // rotate eyes and mouth
         const MAT rotmat = getRotationMatrix2D(cv::Point2f(float(detpar_roi.x),
-                                               float(detpar_roi.y)),
+                                                           float(detpar_roi.y)),
                                                -detpar.rot, 1.);
-        AlignShapeInPlace(eyemouth_shape, rotmat);
+        TransformShapeInPlace(eyemouth_shape, rotmat);
     }
     if (Valid(detpar.lex))
     {
@@ -117,21 +117,15 @@ Shape ImgShapeToRoiFrame(     // return shape in ROI frame
     const DetPar& detpar_roi, // in: detpar wrt the ROI
     const DetPar& detpar)     // in
 {
-    Shape outshape(shape.clone());
-    for (int i = 0; i < outshape.rows; i++)
-        if (PointUsed(outshape, i))
-        {
-            outshape(i, IX) -= detpar.x - detpar_roi.x;
-            outshape(i, IY) -= detpar.y - detpar_roi.y;
-        }
-
+    Shape outshape(ShiftShape(shape, detpar_roi.x - detpar.x,
+                                     detpar_roi.y - detpar.y));
     if (Valid(detpar.rot) && detpar.rot)
     {
         const MAT rotmat = getRotationMatrix2D(cv::Point2f(float(detpar_roi.x),
                                                float(detpar_roi.y)),
                                                -detpar.rot,
                                                1.);
-        outshape = AlignShape(outshape, rotmat);
+        TransformShapeInPlace(outshape, rotmat);
     }
     return outshape;
 }
@@ -151,18 +145,14 @@ Shape RoiShapeToImgFrame(     // return shape in image frame
         outshape = FlipShape(outshape, face_roi.cols);
     if (Valid(detpar.rot) && detpar.rot)
     {
-        const MAT rotmat = getRotationMatrix2D(cv::Point2f(float(detpar_roi.x),
-                                               float(detpar_roi.y)),
-                                               detpar.rot, 1.);
-        outshape = AlignShape(outshape, rotmat);
+        const MAT rotmat =
+            getRotationMatrix2D(cv::Point2f(float(detpar_roi.x),
+                                            float(detpar_roi.y)),
+                                detpar.rot, 1.);
+        TransformShapeInPlace(outshape, rotmat);
     }
-    for (int i = 0; i < outshape.rows; i++)
-        if (PointUsed(outshape, i))
-        {
-            outshape(i, IX) += detpar.x - detpar_roi.x;
-            outshape(i, IY) += detpar.y - detpar_roi.y;
-        }
-    return outshape;
+    return ShiftShape(outshape, detpar.x - detpar_roi.x,
+                                detpar.y - detpar_roi.y);
 }
 
 void PossiblySetRotToZero( // this is to avoid rotating the image unnecessarily

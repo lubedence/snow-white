@@ -13,16 +13,16 @@
 
 namespace stasm
 {
-static double SHIFT_MOUTH_FROM_NOSE_FRAC = 0.06; // .06 from tuning on D1 set
+static const double SHIFT_MOUTH_FROM_NOSE_FRAC = 0.06; // .06 from tuning on D1 set
 
-static double CHIN_DOWN_RATIO = 0.5; // chin must be this far from mouth
-static double CHIN_DOWN_SHIFT = 0.2;
+static const double CHIN_DOWN_RATIO = 0.5; // chin must be this far from mouth
+static const double CHIN_DOWN_SHIFT = 0.2;
 
-static double CHIN_UP_RATIO   = 2.4; // chin cannot be further than this from mouth
-static double CHIN_UP_SHIFT   = 0.1;
+static const double CHIN_UP_RATIO   = 2.4; // chin cannot be further than this from mouth
+static const double CHIN_UP_SHIFT   = 0.1;
 
-static double TEMPLE_RATIO = .1; // temple must be this far from eye, 0 disables
-static double TEMPLE_SHIFT = 3;
+static const double TEMPLE_RATIO = .1; // temple must be this far from eye, 0 disables
+static const double TEMPLE_SHIFT = 3;
 
 //-----------------------------------------------------------------------------
 
@@ -36,8 +36,8 @@ void ApplyShapeModelHacks( // adjust shape by applying various hacks
     Shape&   shape,        // io: position of features possibly adjusted
     unsigned hackbits)     // in: which hacks to apply, see SHAPEHACKS defs
 {
-    CV_Assert(shape.rows == stasm_NLANDMARKS); // the hacks assume stasm77 points
-    CV_Assert(shape.rows == 77);
+    if (shape.rows != 77) // the shape hacks assume stasm77 points
+        return;           // NOTE return
 
     const double eyemouth = EyeMouthDist(shape);
 

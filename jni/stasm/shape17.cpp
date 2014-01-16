@@ -77,8 +77,28 @@ static const int* Shape17Tab( // get appropriate tab to convert to a 17 point sh
         17, // 15 L17_CTopOfTopLip
         18  // 16 L17_CBotOfBotLip
     };
-    static const int muct_tab[17] = // 68 (XM2VTS) or 76 (MUCT) points
+    static const int aflw_tab[17] = // 21 points (AFLW)
     {
+         7, // 0  L17_LPupil
+        10, // 1  L17_RPupil
+        17, // 2  L17_LMouthCorner
+        19, // 3  L17_RMouthCorner
+         0, // 4  L17_LEyebrowOuter
+         2, // 5  L17_LEyebrowInner
+         3, // 6  L17_REyebrowInner
+         5, // 7  L17_REyebrowOuter
+         6, // 8  L17_LEyeOuter
+         8, // 9  L17_LEyeInner
+         9, // 10 L17_REyeInner
+        11, // 11 L17_REyeOuter
+        14, // 12 L17_CNoseTip
+        13, // 13 L17_LNostril     not right
+        15, // 14 L17_RNostril     not right
+        18, // 15 L17_CTopOfTopLip not right
+        18  // 16 L17_CBotOfBotLip not right
+    };
+    static const int muct_tab[17] = // 68 (XM2VTS) or 76 (MUCT76) points
+    {                               // NOTE: not the multi pie 68 points
         31, // 0  L17_LPupil
         36, // 1  L17_RPupil
         48, // 2  L17_LMouthCorner
@@ -158,49 +178,83 @@ static const int* Shape17Tab( // get appropriate tab to convert to a 17 point sh
          79  // 16 CBotOfBotLip
     };
     const int *tab = NULL;
-    switch(shape.rows)
+    switch (shape.rows)
     {
-        case  17: tab = shape17_tab; break; // identity transform
-        case  20: tab = bioid_tab;   break; // BioID
-        case  22: tab = bioid_tab;   break; // AR
-        case  68: tab = muct_tab;    break; // XM2VTS, 68 point MUCT
-        case  76: tab = muct_tab;    break; // Stasm version 3 (Stasm76 shape)
-        case  77: tab = stasm77_tab; break; // Stasm version 4 (Stasm77 shape)
-        case 194: tab = helen_tab;   break; // Helen
-        case 199: tab = put199_tab;  break; // PUT with me17 points
-        default: Err("Cannot convert %d point shape to 17 points", shape.rows); break;
+    case 17:  tab = shape17_tab; break; // identity transform
+    case 20:  tab = bioid_tab;   break; // BioID
+    case 21:  tab = aflw_tab;    break; // AFLW
+    case 22:  tab = bioid_tab;   break; // AR
+    case 68:  tab = muct_tab;    break; // XM2VTS and MUCT68
+    case 76:  tab = muct_tab;    break; // Stasm version 3 (Stasm76 shape)
+    case 77:  tab = stasm77_tab; break; // Stasm version 4 (Stasm77 shape)
+    case 194: tab = helen_tab;   break; // Helen
+    case 199: tab = put199_tab;  break; // PUT with me17 points
+    default:  tab = NULL; break;
     }
     return tab;
 }
 
-static void TweakHelen(
+static void TweakAflw( // hacks to more closely approximate a me17 shape from an AFLW shape
+    Shape& shape17)    // io
+{
+    const double eyemouth = EyeMouthDist(shape17);
+    // upper and lower lip not available
+    if (PointUsed(shape17, L17_CTopOfTopLip))
+        shape17(L17_CTopOfTopLip, IY) -= .07 * eyemouth;
+    if (PointUsed(shape17, L17_CBotOfBotLip))
+        shape17(L17_CBotOfBotLip, IY) += .07 * eyemouth;
+    // nostrils not available
+    if (PointUsed(shape17, L17_LNostril))
+        shape17(L17_LNostril, IX) += .1 * eyemouth;
+    if (PointUsed(shape17, L17_RNostril))
+        shape17(L17_RNostril, IX) -= .1 * eyemouth;
+}
+
+static void TweakHelen( // hacks to more closely approximate a me17 shape from a Helen shape
     Shape& shape17)     // io
 {
     // pupils not available in the helen set so use mean of eye corners
     if (PointUsed(shape17, L17_LEyeOuter) && PointUsed(shape17, L17_LEyeInner))
     {
-        shape17(L17_LPupil, IX) = (shape17(L17_LEyeOuter, IX) + shape17(L17_LEyeInner, IX)) / 2;
-        shape17(L17_LPupil, IY) = (shape17(L17_LEyeOuter, IY) + shape17(L17_LEyeInner, IY)) / 2;
+        shape17(L17_LPupil, IX) = (shape17(L17_LEyeOuter, IX) +
+                                   shape17(L17_LEyeInner, IX)) / 2;
+
+        shape17(L17_LPupil, IY) = (shape17(L17_LEyeOuter, IY) +
+                                   shape17(L17_LEyeInner, IY)) / 2;
     }
     if (PointUsed(shape17, L17_REyeOuter) && PointUsed(shape17, L17_REyeInner))
     {
-        shape17(L17_RPupil, IX) = (shape17(L17_REyeOuter, IX) + shape17(L17_REyeInner, IX)) / 2;
-        shape17(L17_RPupil, IY) = (shape17(L17_REyeOuter, IY) + shape17(L17_REyeInner, IY)) / 2;
+        shape17(L17_RPupil, IX) = (shape17(L17_REyeOuter, IX) +
+                                   shape17(L17_REyeInner, IX)) / 2;
+
+        shape17(L17_RPupil, IY) = (shape17(L17_REyeOuter, IY) +
+                                   shape17(L17_REyeInner, IY)) / 2;
     }
     // nose tip and nostrils not available, fake it by shifting available points up
-    if (PointUsed(shape17, L17_LPupil) && PointUsed(shape17,  L17_RPupil))
+    if (PointUsed(shape17, L17_LPupil) && PointUsed(shape17, L17_RPupil))
     {
-        const double shift = .08 * PointDist(shape17, L17_LPupil, L17_RPupil);
-        shape17(L17_CNoseTip, IY) -= 2 * shift;
-        shape17(L17_LNostril, IY) -= shift;
-        shape17(L17_RNostril, IY) -= shift;
+        const double shift = .1 * PointDist(shape17, L17_LPupil, L17_RPupil);
+        if (PointUsed(shape17, L17_CNoseTip))
+            shape17(L17_CNoseTip, IY) -= 2 * shift;
+        if (PointUsed(shape17, L17_LNostril))
+            shape17(L17_LNostril, IY) -= shift;
+        if (PointUsed(shape17, L17_RNostril))
+            shape17(L17_RNostril, IY) -= shift;
     }
 }
 
-Shape Shape17(          // convert an arb face shape to a 17 point shape
+Shape Shape17OrEmpty(   // like Shape17 but return zero point shape if can't convert
     const Shape& shape) // in
 {
     const int* const tab = Shape17Tab(shape);
+    if (!tab)
+    {
+        static int printed;
+        PrintOnce(printed,
+            "\nDo not know how to convert a %d point shape to a 17 point face...\n",
+            shape.rows);
+        return Shape(0, 2); // note return
+    }
     Shape shape17(17, 2);
     for (int i = 0; i < 17; i++)
     {
@@ -209,9 +263,64 @@ Shape Shape17(          // convert an arb face shape to a 17 point shape
         shape17(i, IX) = shape(iold, IX);
         shape17(i, IY) = shape(iold, IY);
     }
-    if (shape.rows == 194) // helen set? www.ifp.illinois.edu/~vuongle2/helen
+    if (shape.rows == 21) // 21 point AFLW set?
+        TweakAflw(shape17);
+    else if (shape.rows == 194) // 194 point Helen set?
         TweakHelen(shape17);
+
     return shape17;
+}
+
+Shape Shape17( // convert an arb face shape to a 17 point shape, err if can't
+    const Shape& shape) // in
+{
+    Shape shape17(Shape17OrEmpty(shape));
+    if (shape17.rows == 0)
+        Err("Cannot convert %d point shape to 17 points", shape.rows);
+    return shape17;
+}
+
+static void CheckX( // check that the point "left" is leftwards of the point "right"
+    const Shape& shape, // in
+    int          left,  // in
+    int          right) // in
+{
+    if (PointUsed(shape, left) &&
+       PointUsed(shape, right) &&
+       shape(right, IX) < shape(left, IX))
+    {
+        Err("shape17 point %d is to the left of point %d", right, left);
+    }
+}
+
+static void CheckY( // check that the point "bot" is below the point "top"
+    const Shape& shape, // in
+    int          top,   // in
+    int          bot)   // in
+{
+    if (PointUsed(shape, top) &&
+       PointUsed(shape, bot) &&
+       shape(bot, IY) < shape(top, IY))
+    {
+        Err("shape17 point %d is below point %d", top, bot);
+    }
+}
+
+void SanityCheckShape17( // check that left pupil is to the left of the right pupil, etc
+    const Shape& shape17) // in
+{
+    CV_Assert(shape17.rows == 17);
+    CheckX(shape17, L17_LPupil,        L17_RPupil);
+    CheckX(shape17, L17_LMouthCorner,  L17_RMouthCorner);
+    CheckX(shape17, L17_LEyebrowOuter, L17_LEyebrowInner);
+    CheckX(shape17, L17_REyebrowInner, L17_REyebrowOuter);
+    CheckX(shape17, L17_LEyebrowOuter, L17_REyebrowOuter);
+    CheckX(shape17, L17_LEyeOuter,     L17_LEyeInner);
+    CheckX(shape17, L17_REyeInner,     L17_REyeOuter);
+    CheckY(shape17, L17_LPupil,        L17_LMouthCorner);
+    CheckY(shape17, L17_RPupil,        L17_RMouthCorner);
+    CheckY(shape17, L17_LPupil,        L17_CNoseTip);
+    CheckY(shape17, L17_CTopOfTopLip,  L17_CBotOfBotLip);
 }
 
 } // namespace stasm

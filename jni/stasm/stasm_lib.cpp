@@ -10,12 +10,12 @@ const char* const stasm_VERSION = STASM_VERSION;
 
 static vec_Mod mods_g;    // the ASM model(s)
 static FaceDet facedet_g; // the face detector
-static Image   img_g;     // the current image
 
 //-----------------------------------------------------------------------------
 
 namespace stasm
 {
+static Image img_g;     // the current image
 static void CheckStasmInit(void)
 {
     if (mods_g.empty())
@@ -122,6 +122,9 @@ int stasm_open_image_ext(  // extended version of stasm_open_image
 
         img_g = Image(height, width,(unsigned char*)img);
 
+#if TRACE_IMAGES
+        strcpy(imgpath_g, imgpath); // save the image path (for naming debug images)
+#endif
         // call the face detector to detect the face rectangle(s)
         facedet_g.DetectFaces_(img_g, imgpath, multiface == 1, minwidth, user);
     }
@@ -181,10 +184,16 @@ int stasm_search_auto_ext( // extended version of stasm_search_auto
 
             // do the actual ASM search
             shape = mods_g[imod]->ModSearch_(shape, face_roi);
-
-            shape = RoiShapeToImgFrame(shape, face_roi, detpar_roi, detpar);
+#if TRACE_IMAGES
+            CImage cimg; cvtColor(face_roi, cimg, CV_GRAY2BGR); // color image
+            DrawShape(cimg, shape);
+            char s[SLEN]; sprintf(s, "%s_90_roishape.bmp", Base(imgpath_g));
+            lprintf("%s\n", s);
+            if (!cv::imwrite(s, cimg))
+                Err("Cannot write %s", s);
+#endif
+            shape = RoundMat(RoiShapeToImgFrame(shape, face_roi, detpar_roi, detpar));
             // now working with non flipped start shape in image frame
-            RoundMat(shape);
             ShapeToLandmarks(landmarks, shape);
             if (estyaw)
                 *estyaw = float(detpar.yaw);
@@ -257,9 +266,8 @@ int stasm_search_pinned(    // call after the user has pinned some points
 
         shape = mods_g[imod]->ModSearch_(shape, face_roi, &pinned_roi); // ASM search
 
-        shape = RoiShapeToImgFrame(shape, face_roi, detpar_roi, detpar);
+        shape = RoundMat(RoiShapeToImgFrame(shape, face_roi, detpar_roi, detpar));
         // now working with non flipped start shape in image frame
-        RoundMat(shape);
         ForcePinnedPoints(shape, pinnedshape); // undo above RoundMat on pinned points
         ShapeToLandmarks(landmarks, shape);
         if (trace_g)
@@ -290,9 +298,9 @@ void stasm_force_points_into_image( // force landmarks into image boundary
     }
 }
 
-void stasm_convert_shape( // convert stasm 77 points to given number of points
-    float* landmarks,  // io: return all points zero if can't do conversion
-    int    nlandmarks) // in: 77=nochange 76=stasm3 68=xm2vts 22=ar 20=bioid 17=me17
+void stasm_convert_shape( // convert stasm_NLANDMARKS points to given number of points
+    float* landmarks,     // io: return all points zero if can't do conversion
+    int    nlandmarks)    // in: see ConvertShape
 {
     Shape newshape = ConvertShape(LandmarksAsShape(landmarks), nlandmarks);
     if (newshape.rows)

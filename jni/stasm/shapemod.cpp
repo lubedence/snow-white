@@ -30,8 +30,8 @@ static void LimitB(
 // shape model until convergence.  Instead we use the b from the previous
 // iteration of the ASM, which gives as good landmark fit results, empirically.
 
-static Shape ConformShapeToMod( // Return a copy of inshape conformed to the model
-    VEC&         b,             // io: eigvec weights
+Shape ConformShapeToMod( // Return a copy of inshape conformed to the model
+    VEC&         b,             // io: eigvec weights, 2n x 1
     const Shape& inshape,       // in: the current position of the landmarks
     const Shape& meanshape,     // in: n x 2
     const VEC&   eigvals,       // in: neigs x 1
@@ -51,7 +51,7 @@ static Shape ConformShapeToMod( // Return a copy of inshape conformed to the mod
 
     // transform the shape into the model space
 
-    modelshape = AlignShape(shape, pose.inv(cv::DECOMP_LU));
+    modelshape = TransformShape(shape, pose.inv(cv::DECOMP_LU));
 
     // update shape model params b to match modelshape, then limit b
 
@@ -65,16 +65,26 @@ static Shape ConformShapeToMod( // Return a copy of inshape conformed to the mod
 
     // back to image space
 
-    return AlignShape(meanshape + conformedshape, pose);
+    return JitterPointsAt00(TransformShape(meanshape + conformedshape, pose));
 }
 
-static VEC PointWeights(void) // return point weights from LANDMARK_INFO_TAB
+VEC PointWeights(void) // return point weights from LANDMARK_INFO_TAB
 {
-    CV_DbgAssert(NELEMS(LANDMARK_INFO_TAB) == stasm_NLANDMARKS);
+    // default to all points have a weight of 1
+    VEC pointweights(MAX(stasm_NLANDMARKS, NELEMS(LANDMARK_INFO_TAB)), 1, 1.);
 
-    VEC pointweights(stasm_NLANDMARKS, 1);
-
-    for (int i = 0; i < stasm_NLANDMARKS; i++)
+    if (stasm_NLANDMARKS != NELEMS(LANDMARK_INFO_TAB))
+    {
+        // It's safest to fix this problem and rebuild stasm and tasm.  But this is
+        // a lprintf_always instead of Err to allow tasm to run, to avoid a catch-22
+        // situation where we can't create a new model with tasm but don't want the
+        // old model.
+        lprintf_always(
+            "Warning: PointWeights: all points weighted as 1 because "
+            "stasm_NLANDMARKS %d does not match NELEMS(LANDMARK_INFO_TAB) %d\n",
+            stasm_NLANDMARKS, NELEMS(LANDMARK_INFO_TAB));
+    }
+    else for (int i = 0; i < NELEMS(LANDMARK_INFO_TAB); i++)
         pointweights(i) = LANDMARK_INFO_TAB[i].weight;
 
     return pointweights;
@@ -96,7 +106,7 @@ const
                         eigvals_ / pow(SQ(PYR_RATIO), ilev), eigvecs_, eigvecsi_,
                         bmax_, pointweights);
 
-    newshape = JitterPointsAt00(newshape); // jitter points at 0,0 if any
+    JitterPointsAt00InPlace(newshape); // jitter points at 0,0 if any
 
     if (ilev >= SHAPEHACK_MINPYRLEV) // allow shape hacks only at coarse pyr levs
         ApplyShapeModelHacks(newshape, hackbits_);

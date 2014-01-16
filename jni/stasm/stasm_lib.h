@@ -114,9 +114,9 @@ void stasm_force_points_into_image( // force landmarks into image boundary
     int          nrows);            // in
 
 extern "C"
-void stasm_convert_shape( // convert stasm 77 points to given number of points
+void stasm_convert_shape( // convert stasm_NLANDMARKS points to given number of points
     float* landmarks,     // io: return all points zero if can't do conversion
-    int    nlandmarks);   // in: 77=nochange 76=stasm3 68=xm2vts 22=ar 20=bioid 17=me17
+    int    nlandmarks);   // in: see ConvertShape
 
 // stasm_printf is like printf but also prints to the file stasm.log if it
 // is open.  The file stasm.log will be open if stasm_init was called with

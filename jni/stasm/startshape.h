@@ -2,11 +2,28 @@
 //
 // Copyright (C) 2005-2013, Stephen Milborrow
 
-#ifndef STASM_startshape_H
-#define STASM_startshape_H
+#ifndef STASM_STARTSHAPE_H
+#define STASM_STARTSHAPE_H
 
 namespace stasm
 {
+// The constant 200 is arbitrary, except that the value used by Stasm
+// must match that used by Tasm when training the model.  Using 200 instead
+// of say, 1, means that the detector average face is displayable at a decent
+// size which is useful for debugging.
+
+static const int DET_FACE_WIDTH = 200;
+
+#if TRACE_IMAGES
+extern char imgpath_g[]; // the filepath of the current image, used for debugging
+#endif
+
+double EyeAngle(           // eye angle in degrees, INVALID if eye angle not available
+    const DetPar& detpar); // in: detpar wrt the ROI
+
+double EyeAngle(           // eye angle in degrees, INVALID if eye angle not available
+    const Shape& shape);   // in
+
 // get the start shape for the next face in the image, and the ROI around it
 
 bool NextStartShapeAndRoi(     // use face detector results to estimate start shape
@@ -29,4 +46,4 @@ void PinnedStartShapeAndRoi(   // use the pinned landmarks to init the start sha
     const Shape&   pinned);    // in: pinned landmarks
 
 } // namespace stasm
-#endif // STASM_startshape_H
+#endif // STASM_STARTSHAPE_H

@@ -358,7 +358,7 @@ static void WrapHistograms(
 }
 
 static void CopyHistsToDesc(    // copy histograms to descriptor, skipping pad bins
-    VEC&       desc,            // out
+    VEC&              desc,     // out
     const vec_double& histbins) // in
 {
     for (int row = 0; row < GRIDHEIGHT; row++)

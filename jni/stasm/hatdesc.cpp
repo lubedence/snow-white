@@ -1,5 +1,5 @@
 // hatdesc.cpp: Model for HAT descriptors.
-//              This does a grid search using the descriptors defined hat.cpp.
+//              This does a grid search using the descriptors defined in hat.cpp.
 //              It also caches the descriptors for fast reuse.
 //
 // Copyright (C) 2005-2013, Stephen Milborrow
@@ -32,8 +32,8 @@ static Hat hat_g;
 #if CACHE
 
 // For speed, we cache the HAT descriptors, so we have the descriptor at
-// hand if we revisit an xy position in the image which is very common in ASMs.
-// (Note: an implementation with cache_g as a vector<vector VEC>> was slower.)
+// hand if we revisit an xy position in the image, which is very common in ASMs.
+// (Note: an implementation with cache_g as a vector<vector VEC> was slower.)
 
 static hash_map<unsigned, VEC> cache_g; // cached descriptors
 static const bool TRACE_CACHE = 0;      // for checking cache hit rate
@@ -116,6 +116,13 @@ void InitHatLevData(   // init the global HAT data needed for this pyr level
         cache_g.clear();
 #endif
     }
+}
+
+VEC HatDesc( // used only during training new models
+    double x,   // in
+    double y)   // in
+{
+    return hat_g.Desc_(cvRound(x), cvRound(y));
 }
 
 // Note 1: The image is not passed directly to this function.  Instead this

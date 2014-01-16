@@ -115,12 +115,17 @@ static inline int Pix( // get pixel at ix and iy, forcing ix and iy in range
 // and the center point of the whisker.
 // We also use shape for figuring out the direction of the whisker.
 
-static void FullProf(
-    VEC&         fullprof, // out
-    const Image& img,      // in
-    const MAT&   shape,    // in
-    int          ipoint)   // in: index of the current point
+static VEC FullProf(          // return full profile
+    const Image& img,         // in
+    const MAT&   shape,       // in
+    int          ipoint,      // in: index of the current point
+    int          fullproflen) // in
 {
+    CV_Assert(fullproflen > 1 && fullproflen < 100); // 100 is arb
+    CV_Assert(fullproflen % 2 == 1); // fullprof length must be odd
+
+    VEC fullprof(1, fullproflen);
+
     double xstep; // x axis dist corresponding to one pixel along whisker
     double ystep;
     WhiskerStep(xstep, ystep, shape, ipoint);
@@ -138,13 +143,13 @@ static void FullProf(
     {
         const int pix = Pix(img,
                             Step(x, xstep, i), Step(y, ystep, i));
-
         fullprof(i + n) = double(pix - prevpix); // signed gradient
         prevpix = pix;
     }
+    return fullprof;
 }
 
-double SumAbsElems( // return the sum of the abs values of the elems of mat
+static double SumAbsElems( // return the sum of the abs values of the elems of mat
     const MAT& mat) // in
 {
     CV_Assert(mat.isContinuous());
@@ -154,6 +159,40 @@ double SumAbsElems( // return the sum of the abs values of the elems of mat
     while (i--)
         sum += ABS(data[i]);
     return sum;
+}
+
+static VEC SubProf(      // return the profile at given offset within fullprof
+    int        offset,   // in: offset along whisker in pixels
+    int        proflen,  // in
+    const VEC& fullprof) // in
+{
+    CV_Assert(proflen > 1 && proflen < 100); // 100 is arb
+    CV_Assert(proflen % 2 == 1); // prof length must be odd
+
+    VEC prof(1, proflen); // the profile at the given offset along whisker
+
+    // copy the relevant part of fullprof into prof
+
+    memcpy(Buf(prof),
+           Buf(fullprof) + offset + NSIZE(fullprof)/2 - NSIZE(prof)/2,
+           NSIZE(prof) * sizeof(prof(0)));
+
+    // normalize prof
+
+    double sum = SumAbsElems(prof);
+    if (!IsZero(sum))
+        prof *= NSIZE(prof) / sum;
+
+    return prof;
+}
+
+VEC ClassicProf(           // currently used only when training a new model
+    const Image& img,      // in: the image scaled to this pyramid level
+    const Shape& inshape,  // in: current posn of landmarks (for whisker directions)
+    int          ipoint,   // in: index of the current landmark
+    int          proflen)  // in
+{
+    return SubProf(0, proflen, FullProf(img, inshape, ipoint, proflen));
 }
 
 // This returns a double equal to x.t() * mat * x.
@@ -189,39 +228,6 @@ static double xAx(
     return diagsum + 2 * sum; // "2 *" to include lower left triangle elements
 }
 
-// Get the profile distance.  That is,  get the image profile at the given
-// offset  along the whisker, and return the Mahalanobis distance between
-// it and the model mean profile.  Low distance means good fit.
-
-static double ProfDist(
-    int        offset,    // in: offset along whisker in pixels
-    int        proflen,   // in
-    const VEC& fullprof,  // in
-    const VEC& meanprof,  // in: mean of the training profiles for this point
-    const MAT& covi)      // in: inverse of the covar of the training profiles
-{
-    VEC prof(1, proflen); // the profile at the given offset along whisker
-
-    // copy the relevant part of fullprof into prof
-
-    memcpy(Buf(prof),
-           Buf(fullprof) + offset + NSIZE(fullprof)/2 - NSIZE(prof)/2,
-           NSIZE(prof) * sizeof(prof(0)));
-
-    // normalize prof
-
-    double sum = SumAbsElems(prof);
-    if (!IsZero(sum))
-        prof *= NSIZE(prof) / sum;
-
-    // The following code is equivalent to
-    //      return (prof - meanprof).t() * covi * (prof - meanprof)
-    // but is optimized for speed.
-
-    prof -= meanprof;      // for efficiency, use "-=" not "=" with "-"
-    return xAx(prof, covi);
-}
-
 // If OpenMP is enabled, multiple instances of this function will be called
 // concurrently (each call will have a different value of x and y). Thus this
 // function and its callees do not modify any data that is not on the stack.
@@ -243,9 +249,9 @@ void ClassicDescSearch(    // search along whisker for best profile match
     // the current position of the landmark.
     // We precalculate the fullprof for efficiency in the for loop below.
 
-    VEC fullprof(1, proflen + 2 * CLASSIC_MAX_OFFSET);
-    CV_Assert(NSIZE(fullprof) % 2 == 1); // fullprof length must be odd
-    FullProf(fullprof, img, inshape, ipoint);
+    const int fullproflen = proflen + 2 * CLASSIC_MAX_OFFSET;
+    CV_Assert(fullproflen % 2 == 1); // fullprof length must be odd
+    const VEC fullprof(FullProf(img, inshape, ipoint, fullproflen));
 
     // move along the whisker looking for the best match
 
@@ -255,7 +261,18 @@ void ClassicDescSearch(    // search along whisker for best profile match
              offset <= CLASSIC_MAX_OFFSET;
              offset += CLASSIC_SEARCH_RESOL)
     {
-        const double dist = ProfDist(offset, proflen, fullprof, meanprof, covi);
+        // Get the profile distance.  That is,  get the image profile at the given
+        // offset along the whisker, and return the Mahalanobis distance between
+        // it and the model mean profile.  Low distance means good fit.
+
+        const VEC prof(SubProf(offset, proflen, fullprof));
+
+        // The following code is equivalent to
+        //      dist = (prof - meanprof).t() * covi * (prof - meanprof)
+        // but is optimized for speed.
+
+        prof -= meanprof;      // for efficiency, use "-=" not "=" with "-"
+        const double dist = xAx(prof, covi);
 
         if (dist < mindist)
         {

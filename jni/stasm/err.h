@@ -10,6 +10,7 @@ namespace stasm
 void CatchOpenCvErrs(void);
 void UncatchOpenCvErrs(void);
 void Err(const char* format, ...);
+void ClearLastErr(void);
 const char* LastErr(void); // return the last error message
 
 } // namespace stasm

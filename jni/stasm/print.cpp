@@ -18,14 +18,14 @@ static FILE* logfile_g;  // lprintfs go to this log file as well as stdout
 // Open the log file. After this, when you call lprintf, you print to the log
 // file (as well as to stdout).  This inits the global variable logfile_g.
 
-void OpenLogFile(void)  // also inits the global variable logfile_g
+void OpenLogFile(     // also inits the global variable logfile_g
+    const char* path) // in: log file path, default is "stasm.log"
 {
     if (!logfile_g)
     {
-        static const char* const path = "stasm.log";
         if (print_g)
-            printf("Opening %s\n", path);
-        logfile_g = fopen(path, "wt");
+            printf("Generating %s\n", path);
+        logfile_g = fopen(path, "wb");
         if (!logfile_g)
             Err("Cannot open \"%s\"", path);
         // check that we can write to the log file
@@ -35,19 +35,26 @@ void OpenLogFile(void)  // also inits the global variable logfile_g
     }
 }
 
-// Like printf but only prints if print_g flag is set,
-// and also prints to the log file if it is open.
+// Like printf but only prints if print_g flag is set.
+// Also prints to the log file if it is open (regardless of print_g).
 
 void lprintf(const char* format, ...)   // args like printf
 {
+    char s[SBIG];
+    va_list args;
+    va_start(args, format);
+    VSPRINTF(s, format, args);
+    va_end(args);
     if (print_g)
     {
-        char s[SBIG];
-        va_list args;
-        va_start(args, format);
-        VSPRINTF(s, format, args);
-        va_end(args);
-        lputs(s);
+        printf("%s", s);
+        fflush(stdout); // flush so if there is a crash we can see what happened
+    }
+    if (logfile_g)
+    {
+        // we don't check fputs here, to prevent recursive calls and msgs
+        fputs(s, logfile_g);
+        fflush(logfile_g);
     }
 }
 
@@ -69,6 +76,25 @@ void logprintf(const char* format, ...) // args like printf
     }
 }
 
+// Like lprintf but always prints even if print_g is false.
+
+void lprintf_always(const char* format, ...)
+{
+    char s[SBIG];
+    va_list args;
+    va_start(args, format);
+    VSPRINTF(s, format, args);
+    va_end(args);
+    printf("%s", s);
+    fflush(stdout); // flush so if there is a crash we can see what happened
+    if (logfile_g)
+    {
+        // we don't check fputs here, to prevent recursive calls and msgs
+        fputs(s, logfile_g);
+        fflush(logfile_g);
+    }
+}
+
 // Like puts but prints to the log file as well if it is open,
 // and does not append a newline.
 
@@ -79,5 +105,37 @@ void lputs(const char* s)
     logprintf("%s", s);
 }
 
+// Print message only once on the screen, and only 100 times to the log file.
+// This is used when similar messages could be printed many times and it
+// suffices to let the user know just once.  By convention the message is
+// printed followed by "..." so the user knows that just the first message
+// was printed.  The user can look in the log file for further messages if
+// necessary (but we print only 100 times to the log file --- else all the
+// log prints make tasm slow).
+
+void PrintOnce(
+    int&        printed,     // io: zero=print, nonzero=no print
+    const char* format, ...) // in: args like printf
+{
+    char s[SBIG];
+    va_list args;
+    va_start(args, format);
+    VSPRINTF(s, format, args);
+    va_end(args);
+    if (printed == 0 && print_g)
+    {
+        printed = 1;
+        printf("%s", s);
+        fflush(stdout); // flush so if there is a crash we can see what happened
+    }
+    if (printed < 100 && logfile_g)
+    {
+        fputs(s, logfile_g);
+        fflush(logfile_g);
+        printed++;
+        if (printed == 100)
+            logprintf("no more prints of the above message (printed == 100)\n");
+    }
+}
 
 } // namespace stasm

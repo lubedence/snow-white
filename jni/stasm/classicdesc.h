@@ -10,7 +10,7 @@ namespace stasm
 static const int CLASSIC_MAX_OFFSET = 2;   // search +-2 pixels along the whisker
 static const int CLASSIC_SEARCH_RESOL = 2; // search resolution, every 2nd pix
 
-extern void ClassicDescSearch( // search along whisker for best profile match
+void ClassicDescSearch(    // search along whisker for best profile match
     double&      x,        // io: (in: current posn of the point, out: new posn)
     double&      y,        // io:
     const Image& img,      // in: the image scaled to this pyramid level
@@ -18,6 +18,12 @@ extern void ClassicDescSearch( // search along whisker for best profile match
     int          ipoint,   // in: index of the current landmark
     const MAT&   meanprof, // in: mean of the training profiles for this point
     const MAT&   covi);    // in: inverse of the covar of the training profiles
+
+VEC ClassicProf(           // used only during training a new model
+    const Image& img,      // in: the image scaled to this pyramid level
+    const Shape& inshape,  // in: current posn of landmarks (for whisker directions)
+    int          ipoint,   // in: index of the current landmark
+    int          proflen); // in
 
 class ClassicDescMod: public BaseDescMod
 {

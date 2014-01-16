@@ -10,8 +10,8 @@ typedef vector<DetPar> vec_DetPar;
 
 static cv::CascadeClassifier facedet_g;  // the face detector
 
-static double BORDER_FRAC = 0.1; // fraction of image width or height
-                                 // use 0.0 for no border
+static const double BORDER_FRAC = .1; // fraction of image width or height
+                                      // use 0.0 for no border
 
 //-----------------------------------------------------------------------------
 
@@ -45,6 +45,8 @@ void DetectFaces(          // all face rects into detpars
     const Image& img,      // in
     int          minwidth) // in: as percent of img width
 {
+    CV_Assert(!facedet_g.empty()); // check that OpenFaceDetector_ was called
+
     int leftborder = 0, topborder = 0; // border size in pixels
     Image bordered_img(BORDER_FRAC == 0?
                        img: EnborderImg(leftborder, topborder, img));
@@ -57,7 +59,9 @@ void DetectFaces(          // all face rects into detpars
 
     CV_Assert(minwidth >= 1 && minwidth <= 100);
 
-    int minpix = MAX(100, cvRound(img.cols * minwidth / 100.));
+    // TODO smallest bioid faces are about 80 pixels width, hence 70 below
+    const int minpix =
+        MAX(minwidth <= 5? 70: 100, cvRound(img.cols * minwidth / 100.));
 
     // the params below are accurate but slow
     static const double SCALE_FACTOR   = 1.1;
@@ -65,7 +69,7 @@ void DetectFaces(          // all face rects into detpars
     static const int    DETECTOR_FLAGS = 0;
 
     vec_Rect facerects = // all face rects in image
-        Detect(equalized_img, &facedet_g, NULL,
+        Detect(equalized_img, facedet_g, NULL,
                SCALE_FACTOR, MIN_NEIGHBORS, DETECTOR_FLAGS, minpix);
 
     // copy face rects into the detpars vector
@@ -87,7 +91,6 @@ void DetectFaces(          // all face rects into detpars
         detpars[i] = detpar;
     }
 }
-
 // order by increasing distance from left marg, and dist from top marg within that
 
 static bool IncreasingLeftMargin( // compare predicate for std::sort
@@ -134,15 +137,15 @@ static void DiscardMissizedFaces(
             if (face->width >= minallowed && face->width <= maxallowed)
                 detpars.push_back(*face);
             else if (trace_g || TRACE_IMAGES)
-                lprintf("[discard %d of %d]", iface, NSIZE(all_detpars));
+                lprintf("[discard face%d of %d]", iface, NSIZE(all_detpars));
         }
     }
 }
 
-static void TraceFaces(         // write image showing detected face rects
-    const vec_DetPar& detpars,  // in
-    const Image&      img,      // in
-    const char*       filename) // in
+static void TraceFaces(        // write image showing detected face rects
+    const vec_DetPar& detpars, // in
+    const Image&      img,     // in
+    const char*       path)    // in
 {
 #if TRACE_IMAGES // will be 0 unless debugging (defined in stasm.h)
 
@@ -159,36 +162,40 @@ static void TraceFaces(         // write image showing detected face rects
                   CV_RGB(255,255,0), 2);
 
         ImgPrintf(cimg, // 10 * iface to minimize overplotting
-                  detpar.x + 10 * iface, detpar.y, 0xffff00, 1, ssprintf("%d", iface));
+                  detpar.x + 10 * iface, detpar.y,
+                  C_YELLOW, 1, ssprintf("%d", iface));
     }
-    cv::imwrite(filename, cimg);
-
+    lprintf("%s\n", path);
+    if (!cv::imwrite(path, cimg))
+        Err("Cannot write %s", path);
 #endif
 }
 
-void FaceDet::DetectFaces_(  // call once per image to find all the faces
-    const Image& img,        // in: the image (grayscale)
-    const char*,             // in: unused (match virt func signature)
-    bool         multiface,  // in: if false, want only the best face
-    int          minwidth,   // in: min face width as percentage of img width
-    void*        user)       // in: unused (match virt func signature)
+void FaceDet::DetectFaces_( // call once per image to find all the faces
+    const Image& img,       // in: the image (grayscale)
+    const char*  imgpath,   // in: used only for debugging
+    bool         multiface, // in: if false, want only the best face
+    int          minwidth,  // in: min face width as percentage of img width
+    void*        user)      // in: unused (match virt func signature)
 {
     CV_Assert(user == NULL);
-    CV_Assert(!facedet_g.empty()); // check that OpenFaceDetector_ was called
     DetectFaces(detpars_, img, minwidth);
-    TraceFaces(detpars_, img, "facedet_BeforeDiscardMissizedFaces.bmp");
+    char tracepath[SLEN];
+    sprintf(tracepath, "%s_00_unsortedfacedet.bmp", Base(imgpath));
+    TraceFaces(detpars_, img, tracepath);
     DiscardMissizedFaces(detpars_);
-    TraceFaces(detpars_, img, "facedet_AfterDiscardMissizedFaces.bmp");
     if (multiface) // order faces on increasing distance from left margin
     {
         sort(detpars_.begin(), detpars_.end(), IncreasingLeftMargin);
-        TraceFaces(detpars_, img, "facedet.bmp");
+        sprintf(tracepath, "%s_05_facedet.bmp", Base(imgpath));
+        TraceFaces(detpars_, img, tracepath);
     }
     else
     {
         // order faces on decreasing width, keep only the first (the largest face)
         sort(detpars_.begin(), detpars_.end(), DecreasingWidth);
-        TraceFaces(detpars_, img, "facedet.bmp");
+        sprintf(tracepath, "%s_05_sortedfaces.bmp", Base(imgpath));
+        TraceFaces(detpars_, img, tracepath);
         if (NSIZE(detpars_))
             detpars_.resize(1);
     }

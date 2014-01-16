@@ -1,4 +1,4 @@
-// misc.h: miscellaneous definitions for Stasm
+// misc.cpp: miscellaneous definitions for Stasm
 //
 // Copyright (C) 2005-2013, Stephen Milborrow
 
@@ -193,7 +193,7 @@ void makepath(
 }
 
 void LogShape( // print mat to log file, this is mostly for debugging and testing
-    const MAT&  mat,  // in
+    const MAT&  mat,     // in
     const char* matname) // in
 {
     // print in shapefile format
@@ -212,6 +212,53 @@ void LogShape( // print mat to log file, this is mostly for debugging and testin
         logprintf("\n");
     }
     logprintf("}\n");
+}
+
+static void GetPrintMatFormat(
+    char*      format,         // out: will be something like %3.2f
+    const MAT& mat)            // in
+{
+    // get max elem and if any elems are negative so we can format nicely
+    double max = -1;
+    bool neg = false;
+    bool frac = false;
+    for (int row = 0; row < mat.rows; row++)
+        for (int col = 0; col < mat.cols; col++)
+        {
+            const double elem = mat(row, col);
+            if (ABS(elem) > max)
+                max = ABS(elem);
+            if (elem < 0)
+                neg = true;
+            if (elem != floor(elem))
+                frac = true;
+        }
+
+    if (max >= 1e5)
+        frac = false; // no decimal digit if enough sig digits to left of decimal
+    const int ndigits = NumDigits(max);
+    sprintf(format, "%%%s%d.%s",
+            neg? " ": "", ndigits+neg+(frac? 2: 0)+1, frac? "2f": "0f");
+}
+
+void PrintMat(       // utility to print a matrix
+    const MAT&  mat, // in
+    const char* msg) // in: message
+{
+    char format[SLEN]; // will be something like %3.2f
+    GetPrintMatFormat(format, mat);
+    lprintf("%s %dx%d:\n", msg, mat.rows, mat.cols);
+    for (int row = 0; row < mat.rows; row++)
+    {
+        lprintf("%*d: ", NumDigits(mat.rows), row);
+        for (int col = 0; col < mat.cols; col++)
+        {
+            lprintf(format, mat(row, col));
+            if (col < mat.cols-1)
+                lprintf(" ");
+        }
+        lprintf("\n");
+    }
 }
 
 // This redimensions a matrix and preserves as much of the old data as possible.
@@ -256,15 +303,18 @@ const MAT ArrayAsMat(    // create a MAT from a C array of doubles
     return cv::Mat(nrows, ncols, CV_64FC1, const_cast<double*>(data));
 }
 
-void RoundMat( // round mat entries to integers
-    MAT& mat)  // io
+MAT RoundMat(        // return mat with entries rounded to integers
+    const MAT& mat)  // in
 {
+    MAT newmat(mat.rows, mat.cols);
     for (int i = 0; i < mat.rows; i++)
-    {
-        double* const rowbuf = mat.ptr<double>(i);
         for (int j = 0; j < mat.cols; j++)
-            rowbuf[j] = cvRound(rowbuf[j]);
-    }
+        {
+            newmat(i, IX) = cvRound(mat(i, IX));
+            newmat(i, IY) = cvRound(mat(i, IY));
+        }
+
+    return newmat;
 }
 
 // Force pinned landmarks in shape to their pinned position.
@@ -291,7 +341,7 @@ double ForcePinnedPoints(
     return dist / npinned;
 }
 
-void ShapeMinMax(
+void ShapeMinMax(       // get min and max ccords in the given shape
     double&      xmin,  // out
     double&      xmax,  // out
     double&      ymin,  // out
@@ -324,6 +374,7 @@ double ShapeWidth(const Shape& shape) // width of shape in pixels
 
 double ShapeHeight(const Shape& shape) // height of shape in pixels
 {
+    CV_Assert(shape.rows > 1);
     double xmin, xmax, ymin, ymax;
     ShapeMinMax(xmin, xmax, ymin, ymax, shape);
     return ABS(ymax - ymin);
@@ -333,15 +384,19 @@ double ShapeHeight(const Shape& shape) // height of shape in pixels
 // of a point are zero, Stasm takes that to mean that the point is unused.
 // So prevent that when we know all points in the shape are actually used.
 
+void JitterPointsAt00InPlace(
+    Shape& shape)             // io
+{
+    for (int i = 0; i < shape.rows; i++)
+        if (!PointUsed(shape, i))
+            shape(i, IX) = XJITTER;
+}
+
 Shape JitterPointsAt00(
     const Shape& shape) // in
 {
     Shape outshape(shape.clone());
-
-    for (int i = 0; i < outshape.rows; i++)
-        if (!PointUsed(outshape, i))
-            outshape(i, IX) = XJITTER;
-
+    JitterPointsAt00InPlace(outshape);
     return outshape;
 }
 
@@ -369,8 +424,9 @@ static void Mat33TimesVec(
 // Transform shape by multiplying it by a homogeneous alignment_mat.
 // alignment_mat can be 3x2 or 2x2 (since the bottom row of a homogeneous mat
 // is constant and is ignored here).
+// The term "in place" means that we modify the shape passed to this func.
 
-void AlignShapeInPlace(
+void TransformShapeInPlace(
     Shape&     shape,         // io
     const MAT& alignment_mat) // in
 {
@@ -388,7 +444,7 @@ void AlignShapeInPlace(
         }
 }
 
-void AlignShapeInPlace(
+void TransformShapeInPlace(
     Shape& shape,                    // io
     double x0, double y0, double z0, // in
     double x1, double y1, double z1) // in
@@ -398,40 +454,41 @@ void AlignShapeInPlace(
         x0, y0, z0,
         x1, y1, z1
     };
-    AlignShapeInPlace(shape, MAT(2, 3, transform_data));
+    TransformShapeInPlace(shape, MAT(2, 3, transform_data));
 }
 
-Shape AlignShape(                    // return transformed shape
-    const Shape& shape,              // in
-    const MAT&   alignment_mat)      // in
-{
-    Shape outshape(shape.clone());
-    AlignShapeInPlace(outshape, alignment_mat);
-    return outshape;
-}
-
-Shape AlignShape(                    // return transformed shape
+Shape TransformShape(                // return transformed shape
     const Shape& shape,              // in
     double x0, double y0, double z0, // in
     double x1, double y1, double z1) // in
 {
     Shape outshape(shape.clone());
-    AlignShapeInPlace(outshape, x0, y0, z0, x1, y1, z1);
+    TransformShapeInPlace(outshape, x0, y0, z0, x1, y1, z1);
+    return outshape;
+}
+
+Shape TransformShape(                 // return transformed shape, affine transform
+    const Shape& shape,               // in
+    const MAT&   alignment_mat)       // in
+{
+    Shape outshape(shape.clone());
+    TransformShapeInPlace(outshape, alignment_mat);
     return outshape;
 }
 
 // Solves Ax=b by LU decomposition.  Returns col vec x.
 // The b argument must be a vector (row or column, it doesn't matter).
-// If mat is singular this will fail.
+// If mat is singular this will fail with an error message.
+// See also LinSolve() which will solve any linear system.
 
-static const VEC Solve(MAT& mat, VEC& b) // note that mat and b get destroyed
+static const VEC LinSolveLu(
+    MAT& mat,                // in, but gets destroyed
+    VEC& b)                  // in, but gets destroyed
 {
     CV_Assert(mat.isContinuous() && b.isContinuous());
-
     if (!cv::LU(Buf(mat), mat.cols * sizeof(mat(0)), mat.rows,
                 Buf(b), sizeof(mat(0)), 1))
-        Err("Solve: LU failed");
-
+        Err("LinSolveLu failed");
     return b;
 }
 
@@ -486,14 +543,44 @@ const MAT AlignmentMat(
                                       sx1,
                                       sy1 );
 
-    const VEC soln(Solve(soln_data, vec_data));
+    const VEC soln(LinSolveLu(soln_data, vec_data));
 
     return (MAT(3, 3) << soln(0), -soln(1), soln(2),    //  a -b tx
                          soln(1),  soln(0), soln(3),    //  b  a ty
                                0,        0,       1 );  //  0  0  1
 }
 
-static CvScalar ToCvColor(unsigned color)
+Shape ShiftShape( // add xshift and yshift to shape coords, skipping unused points
+    const Shape& shape,   // in
+    int          xshift,  // in
+    int          yshift)  // in
+{
+    Shape shiftedshape(shape.clone());
+    for (int i = 0; i < shape.rows; i++)
+        if (PointUsed(shape, i))
+        {
+            shiftedshape(i, IX) += xshift;
+            shiftedshape(i, IY) += yshift;
+        }
+    return shiftedshape;
+}
+
+Shape ShiftShape(         // like above but shifts are doubles not ints
+    const Shape& shape,   // in
+    double       xshift,  // in
+    double       yshift)  // in
+{
+    Shape shiftedshape(shape.clone());
+    for (int i = 0; i < shape.rows; i++)
+        if (PointUsed(shape, i))
+        {
+            shiftedshape(i, IX) += xshift;
+            shiftedshape(i, IY) += yshift;
+        }
+    return shiftedshape;
+}
+
+CvScalar ToCvColor(unsigned color)
 {
     CvScalar cvcolor;
     cvcolor.val[0] = (color         & 0xff);
@@ -545,7 +632,7 @@ void DrawShape(             // draw a shape on an image
         }
         i++;
     }
-    while (i != shape.rows && j != shape.rows);
+    while (i < shape.rows && j < shape.rows);
 }
 
 void ImgPrintf(         // printf on image
@@ -595,6 +682,12 @@ void DesaturateImg( // for apps and debugging, unneeded for ASM
             p[0] = p[1] = p[2] = RgbToGray(rowbuf[j]);
         }
     }
+}
+
+void DarkenImg(     // for apps and debugging, unneeded for ASM
+    CImage& img)    // io: darken this image
+{
+    img /= 2;
 }
 
 void ForceRectIntoImg(   // force rectangle into image
@@ -664,11 +757,8 @@ void OpenDetector( // open face or feature detector from its XML file
     {
         char dir[SLEN]; STRCPY(dir, datadir);
         ConvertBackslashesToForwardAndStripFinalSlash(dir);
-
         char path[SLEN]; sprintf(path, "%s/%s", dir, filename);
-
         logprintf("Open %s\n", path);
-
         if (!cascade.load(path))
             Err("Cannot load %s", path);
     }
@@ -689,14 +779,14 @@ static void DiscountSearchRegion(
 
 vec_Rect Detect(                            // detect faces or facial features
     const Image&           img,             // in
-    cv::CascadeClassifier* cascade,         // in
+    cv::CascadeClassifier& cascade,         // in
     const Rect*            searchrect,      // in: search in this region, can be NULL
     double                 scale_factor,    // in
     int                    min_neighbors,   // in
     int                    flags,           // in
     int                    minwidth_pixels) // in: reduces false positives
 {
-    CV_Assert(!cascade->empty());
+    CV_Assert(!cascade.empty());
 
     Rect searchrect1; searchrect1.width = 0;
     if (searchrect)
@@ -718,8 +808,8 @@ vec_Rect Detect(                            // detect faces or facial features
     // to jump to 160 MBytes (multiface2.jpg) versus less than 50 MBytes
     // for the rest of Stasm (Feb 2013).
 
-    cascade->detectMultiScale(roi, feats, scale_factor, min_neighbors, flags,
-                              cvSize(minwidth_pixels, minwidth_pixels));
+    cascade.detectMultiScale(roi, feats, scale_factor, min_neighbors, flags,
+                             cvSize(minwidth_pixels, minwidth_pixels));
 
     if (!feats.empty() && searchrect1.width)
         DiscountSearchRegion(feats, searchrect1);
@@ -729,7 +819,7 @@ vec_Rect Detect(                            // detect faces or facial features
 
 bool IsLeftFacing(EYAW eyaw) // true if eyaw is for a left facing face
 {
-    return int(eyaw) <= int(EYAW_22);
+    return int(eyaw) < int(EYAW00);
 }
 
 int EyawAsModIndex(      // note: returns a negative index for left facing yaws
@@ -741,12 +831,12 @@ int EyawAsModIndex(      // note: returns a negative index for left facing yaws
     {
         switch (eyaw)
         {
-            case EYAW00:  imod =  0; break;
-            case EYAW_45: imod = -2; break;
-            case EYAW_22: imod = -1; break;
-            case EYAW22:  imod =  1; break;
-            case EYAW45:  imod =  2; break;
-            default:      Err("EyawAsModIndex: bad eyaw %d", eyaw); break;
+        case EYAW00:  imod =  0; break;
+        case EYAW_45: imod = -2; break;
+        case EYAW_22: imod = -1; break;
+        case EYAW22:  imod =  1; break;
+        case EYAW45:  imod =  2; break;
+        default:      Err("EyawAsModIndex: bad eyaw %d", eyaw); break;
         }
     }
     CV_Assert(ABS(imod) < NSIZE(mods));
@@ -757,10 +847,8 @@ EYAW DegreesAsEyaw( // this determines what model is best for a given yaw
     double yaw,     // in: yaw in degrees, negative if left facing
     int    nmods)   // in
 {
-    if (nmods == 1)
-        return EYAW00;
-
 #if MOD_3 || MOD_A || MOD_A_EMU // experimental versions
+    CV_Assert(nmods == 3);
     if (yaw < -EYAW_TO_USE_DET45)
         return EYAW_45;
 
@@ -774,26 +862,39 @@ EYAW DegreesAsEyaw( // this determines what model is best for a given yaw
         return EYAW22;
 
     return EYAW45;
-#else
-    CV_Assert(0);
-    return EYAW00; // keep compiler quiet
 #endif
+    return EYAW00;
 }
 
 const char* EyawAsString(EYAW eyaw) // utility for debugging/tracing
 {
     switch (int(eyaw))
     {
-        case EYAW00:  return "YAW00";
-        case EYAW_45: return "YAW_45";
-        case EYAW_22: return "YAW_22";
-        case EYAW22:  return "YAW22";
-        case EYAW45:  return "YAW45";
-        case INVALID: return "YAW_Inv";
-        default:      Err("YawAsString: Invalid eyaw %d", eyaw); break;
+    case EYAW00:  return "YAW00";
+    case EYAW_45: return "YAW_45";
+    case EYAW_22: return "YAW_22";
+    case EYAW22:  return "YAW22";
+    case EYAW45:  return "YAW45";
+    case INVALID: return "YAW_Inv";
+    default:      Err("YawAsString: Invalid eyaw %d", eyaw); break;
     }
     return NULL; // prevent compiler warning
 }
+
+#if TRACE_IMAGES
+unsigned EyawAsColor(EYAW eyaw)
+{
+    unsigned color = C_YELLOW;
+    switch (eyaw)
+    {
+    case EYAW00:  color = C_YELLOW; break;
+    case EYAW_22: color = C_RED;    break; // red is left facing
+    case EYAW22:  color = C_GREEN;  break; // green is right facing
+    default: Err("EyawAsColor: Invalid eyaw %d", eyaw);
+    }
+    return color;
+}
+#endif
 
 DetPar FlipDetPar(          // mirror image of detpar
     const DetPar& detpar,   // in
@@ -828,6 +929,34 @@ DetPar FlipDetPar(          // mirror image of detpar
         detpar_new.mouthy = detpar.mouthy;
     }
     return detpar_new;
+}
+
+
+bool InRect(               // is the center of rect within the enclosing rect?
+    const Rect& rect,      // in
+    const Rect& enclosing) // in
+{
+    int x = rect.x + rect.width / 2;  // center of rectangle
+    int y = rect.y + rect.height / 2;
+
+    return x >= enclosing.x &&
+           x <= enclosing.x + enclosing.width &&
+           y >= enclosing.y &&
+           y <= enclosing.y + enclosing.height;
+}
+
+bool InRect(      // is x,y within the enclosing rect?
+    double x,     // in
+    double y,     // in
+    double left,  // in
+    double top,   // in
+    double right, // in
+    double bot)   // in
+{
+    return x >= left  &&
+           x <= right &&
+           y >= top   &&
+           y <= bot;
 }
 
 } // namespace stasm

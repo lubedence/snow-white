@@ -64,8 +64,9 @@ static int CV_CDECL CvErrorCallbackForStasm(
         // Recursive, we are already processing an error.
         // Not really an issue, only first error will be reported via LastErr.
         printf("\nNested error in CvErrorCallbackForStasm\n"
-               "  Current error: %.80s\n  New error:     %.80s\n",
-               err_g, err_msg);
+               "  Current error: %.80s\n  New error:     %s:%d: %.80s\n",
+               err_g,
+               file_name && file_name[0]? file_name: "unknown file", line, err_msg);
     }
     else
     {
@@ -130,16 +131,21 @@ const char* LastErr(void) // return the last error message, called by stasm_last
         // stasm_lasterr incorrectly (i.e. when there has been no error).
         //
         // TODO But in fact we do actually get here if cv::fastMalloc fails
-        // (within OpenCV) when allocating a small amount of memory (say 10 bytes
+        // (within OpenCV) when allocating a small amount of memory (say 10 bytes,
         // large amounts are ok).  It seems that when there is very little memory
         // remaining, OpenCV does not handle exceptions properly (an exception
         // is raised but the OpenCV error callback function is not called).
         // To reproduce, put the following in your code:
         // volatile void *p; while (1) p = cv::fastMalloc(10);
 
-        STRCPY(err_g, "Illegal call to LastErr");
+        STRCPY(err_g, "Invalid call to LastErr");
     }
     return err_g;
+}
+
+void ClearLastErr(void)
+{
+    err_g[0] = 0;
 }
 
 } // namespace stasm

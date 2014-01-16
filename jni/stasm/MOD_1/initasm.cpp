@@ -3,7 +3,7 @@
 // Copyright (C) 2005-2013, Stephen Milborrow
 
 #include "../stasm.h"
-#include "yaw00.h"
+#include "mh/yaw00.mh"
 
 namespace stasm
 {
@@ -15,17 +15,17 @@ void InitMods(           // initialize ASM model
     {
         mods.resize(1);  // 1 model
 
-        static const Mod mod_yaw00(
-            EYAW00,
-            ESTART_EYES, // ignore detected mouth for best startshape on frontal faces
+        static const Mod mod_yaw00( // constructor, see asm.h
+            EYAW00,      // eyaw
+            ESTART_EYES, // estart
             datadir,
             yaw00_meanshape,
             yaw00_eigvals,
             yaw00_eigvecs,
             20,  // neigs (value from empirical testing)
             1.5, // bmax  (value from empirical testing)
-            SHAPEHACKS_DEFAULT | SHAPEHACKS_SHIFT_TEMPLE_OUT,
-            YAW00_DESCMODS, // defined in yaw00.h
+            SHAPEHACKS_DEFAULT | SHAPEHACKS_SHIFT_TEMPLE_OUT, // hackbits
+            YAW00_DESCMODS, // defined in yaw00.mh
             NELEMS(YAW00_DESCMODS));
 
         mods[0] = &mod_yaw00;

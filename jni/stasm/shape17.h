@@ -29,7 +29,7 @@ enum LANDMARKS_17       // the 17 points that make up a Shape17 shape
 };
 
 #if 0
-static const char *LANDMARKS_17_NAMES[] =
+static const char* const LANDMARKS_17_NAMES[] =
 {
     "LPupil",
     "RPupil",
@@ -53,8 +53,14 @@ static const char *LANDMARKS_17_NAMES[] =
 
 extern const Shape MEANSHAPE17; // mean 17 point shape
 
-Shape Shape17(           // convert an arb face shape to a 17 point shape
-    const Shape& shape); // in
+Shape Shape17OrEmpty(     // like Shape17 but return 0 point shape if can't convert
+    const Shape& shape);  // in
+
+Shape Shape17(            // convert an arb face shape to a 17 point shape, err if can't
+    const Shape& shape);  // in
+
+void SanityCheckShape17(
+    const Shape& shape17); // in
 
 } // namespace stasm
 #endif // STASM_SHAPE17_H

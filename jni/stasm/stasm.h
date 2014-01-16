@@ -5,7 +5,7 @@
 #ifndef STASM_H
 #define STASM_H
 
-static const char* const STASM_VERSION = "4.0.0"
+static const char* const STASM_VERSION = "4.1.0"
 #if MOD_3                     // experimental versions
             "_MOD_3";
 #elif MOD_A1
@@ -61,6 +61,7 @@ static const char* const STASM_VERSION = "4.0.0"
 #include "stasm_landmarks.h"
 #include "stasm_lib.h"
 #include "stasm_lib_ext.h"
+#include "atface.h"
 #include "landmarks.h"
 #include "basedesc.h"
 #include "classicdesc.h"
