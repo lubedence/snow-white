@@ -13,33 +13,38 @@ public class SampleView extends ImageView {
 	final static int N_POINTS = 77;
 	public PointF[] m_vPoint = new PointF[N_POINTS];
 	
-    private Bitmap bm;
-    private Paint  rPaint;
-    private boolean drawMark = false;
+    private Bitmap bm;					//image to draw
+    private Paint  rPaint;				//color of mask/dots
+    private boolean drawMark = false;	//true after facial feature array is set
     
-    private int featureVisType = 0;
+    private int featureVisType = 0;		// 1 = draw mask, 0 = draw dots of facial feature points
     
 	public SampleView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-        setFocusable(true);
-        
+
+		//set color (red)
         rPaint = new Paint();
         rPaint.setColor(Color.RED);
         rPaint.setStyle(Paint.Style.STROKE);
         
-        //visualization type: dots(0) or mask(1)
+        //visualization type of facial features: dots(0) or mask(1)
         featureVisType = MyStoredData.getInstance().getSharedPreferences().getInt(context.getString(R.string.settings_featureVis_id), 0);
-
+        
 		for(int i = 0; i < N_POINTS; i++) {
 			m_vPoint[i] = new PointF(0.0f, 0.0f);
 		}
 	}
 	
+	//set image to draw (no facial features)
     public void setBM(Bitmap bmImg) {
     	bm = bmImg;
     	drawMark = false;
     }
-        
+   
+    //set image and facial point to draw. 
+    //points[0|2|4|...] => x, points[1|3|5|...] => y
+    //rw = scale-ratio for image-width, rh = scale-ratio for image-height
+    //rw and rh are necessary, if the drawn image has a different scaling as the processed image
     public void setBM(Bitmap bmImg, int[] points, float rw, float rh) {
     	bm = bmImg;
     	for (int i = 0; i < points.length/2; i++) {
@@ -49,6 +54,8 @@ public class SampleView extends ImageView {
     	drawMark = true;
     }
     
+    //set image and facial point to draw. 
+    //points[0|2|4|...] => x, points[1|3|5|...] => y
     public void setBM(Bitmap bmImg, int[] points) {
     	bm = bmImg;
     	for (int i = 0; i < points.length/2; i++) {
@@ -69,22 +76,25 @@ public class SampleView extends ImageView {
         	if(featureVisType == 1)
         		DrawMask(canvas);
         	else
-        		DrawPoints(canvas);
+        		DrawDots(canvas);
         }
     }
     
-    void DrawPoints(Canvas canvas) {
+    void DrawDots(Canvas canvas) {
     	for(int i = 0; i < m_vPoint.length; i++) {
     		canvas.drawCircle((int)m_vPoint[i].x, (int)m_vPoint[i].y, (2 * this.getResources().getDisplayMetrics().density), rPaint);
     	}
     }
     
     void DrawMask(Canvas canvas) {
+    	
+    	//face boundaries
     	for(int i = 1; i < 16; i++) {
     		canvas.drawLine((int)m_vPoint[i-1].x, (int)m_vPoint[i-1].y, (int)m_vPoint[i].x, (int)m_vPoint[i].y, rPaint);
     	}
     	canvas.drawLine((int)m_vPoint[15].x, (int)m_vPoint[15].y, (int)m_vPoint[0].x, (int)m_vPoint[0].y, rPaint);
     	
+    	//------------left side of face--------------
     	myDrawLine(canvas, m_vPoint[0], m_vPoint[50]);
     	myDrawLine(canvas, m_vPoint[1], m_vPoint[50]);
     	myDrawLine(canvas, m_vPoint[1], m_vPoint[58]);
@@ -136,11 +146,6 @@ public class SampleView extends ImageView {
     	myDrawLine(canvas, m_vPoint[51], m_vPoint[52]);
     	myDrawLine(canvas, m_vPoint[51], m_vPoint[56]);
     	
-    	/*for(int i = 30; i < 37; i++) {
-    		myDrawLine(canvas, m_vPoint[i], m_vPoint[i++]);
-    		myDrawLine(canvas, m_vPoint[i], m_vPoint[38]);
-    	}*/
-    	
     	//left eye
     	myDrawLine(canvas, m_vPoint[30], m_vPoint[31]);
     	myDrawLine(canvas, m_vPoint[31], m_vPoint[32]);
@@ -156,7 +161,6 @@ public class SampleView extends ImageView {
     	myDrawLine(canvas, m_vPoint[34], m_vPoint[38]);
     	myDrawLine(canvas, m_vPoint[35], m_vPoint[38]);
     	myDrawLine(canvas, m_vPoint[36], m_vPoint[38]);
-
     	myDrawLine(canvas, m_vPoint[37], m_vPoint[30]);
     	myDrawLine(canvas, m_vPoint[37], m_vPoint[38]);
     	
@@ -255,6 +259,7 @@ public class SampleView extends ImageView {
     }
 
 
+    //free memory
     public void clearBitmap(){
     	if (bm != null && !bm.isRecycled()) {
     		bm.recycle();

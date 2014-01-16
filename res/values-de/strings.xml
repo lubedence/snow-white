@@ -36,5 +36,7 @@
     <string name="stasm_error_loading">Bild kann nicht geöffnet werden!</string>
     <string name="stasm_error_processing">Fehler während Gesichtserkennung!</string>
     <string name="stasm_error_finding">Gesichtserkennung fehlgeschlagen!</string>
+    
+    <string name="image_not_saved">Galerie-Bild kann nicht verarbeitet werden!</string>
 
 </resources>

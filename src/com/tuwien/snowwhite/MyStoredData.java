@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+//singleton to work with a single instance of shared preferences on the whole project
 public class MyStoredData {
 	
 	 private static MyStoredData instance = null;

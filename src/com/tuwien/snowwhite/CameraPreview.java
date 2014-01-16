@@ -19,18 +19,19 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-/** A basic Camera preview class */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+	private final static String TAG = "CameraPreview";
+	
     private SurfaceHolder mHolder;
-    private Camera mCamera;
-    private String TAG = "CameraPreview";
-    private int viewWidth;
-    private boolean previewIsRunning = false;
+    private Camera mCamera;		//camera object for the preview
+    private int viewWidth;		//display width
+    private boolean previewIsRunning = false; //true as soon as preview is running
 
     public CameraPreview(Context context, Camera camera) {
         super(context);
         mCamera = camera;
         
+        //get display width
         Point outSize = new Point();
         ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getSize(outSize);
         viewWidth = outSize.x;
@@ -43,6 +44,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
+    //called by the CamActivity on camera switch (front/back)
     public void setCamera(Camera c){
     	if(mCamera != null){
     		mCamera.release();
@@ -51,25 +53,32 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     	mCamera = c;
     }
     
+    //start preview
     public void startPreview(){
     	try {
         	Parameters p=mCamera.getParameters(); 
-        	p.setRotation(270);
+        	//p.setRotation(270); //rotate preview to portrait mode
         	
+        	//get the optimal preview size
         	List<Size> sizes = p.getSupportedPreviewSizes();
         	Size optimalSize = getOptimalPreviewSize(sizes, this.getWidth(), this.getHeight());
         	p.setPreviewSize(optimalSize.width, optimalSize.height);
 
+        	//set the layout height to match the preview ratio
         	this.setLayoutParams(new FrameLayout.LayoutParams(viewWidth,Math.round(viewWidth*((float)optimalSize.width/optimalSize.height))));
         	mCamera.setParameters(p);	
-        	mCamera.setDisplayOrientation(90);
+        	mCamera.setDisplayOrientation(90); //rotate preview to portrait mode
             mCamera.setPreviewDisplay(mHolder);
+            
+            //callback for the first displayed frame, so we know when the preview has finished initializing
             mCamera.setOneShotPreviewCallback(new PreviewCallback() {
 				@Override
 				public void onPreviewFrame(byte[] data, Camera camera) {
 					previewIsRunning = true;
 				}
 			});
+            
+            //start preview
             mCamera.startPreview();
             
             
@@ -78,31 +87,18 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     }
     
+    //has preview finished initializing and is running?
     public boolean isPreviewRunning(){
     	return previewIsRunning;
     }
   
-    
-    @Override
-    public void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        if (changed) {
-            //(this).layout(0, 0, viewWidth, viewWidth*4/3);
-        }
-    }
-
-    
+    //start preview as soon as surface is created
     public void surfaceCreated(SurfaceHolder holder) {
-        // The Surface has been created, now tell the camera where to draw the preview.
-    	//TODO: set flag to enable "take picture"-button
     	startPreview();     
     }
     
-    public void onFaceDetection(Face[] faces, Camera camera) {  
-    	Log.e("FACEDETECTION", "COUNT: "+faces.length);
-    }
-
+    //releasing the camera preview
     public void surfaceDestroyed(SurfaceHolder holder) {
-        // empty. Take care of releasing the Camera preview in your activity.
     	if(mCamera != null){
     		previewIsRunning = false;
     		mCamera.release();
@@ -112,40 +108,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-        // If your preview can change or rotate, take care of those events here.
-        // Make sure to stop the preview before resizing or reformatting it.
-    	
-    	//TODO: preview CANT change, so no need for the following stuff???
-
-       /* if (mHolder.getSurface() == null){
-          // preview surface does not exist
-          return;
-        }
-
-        // stop preview before making changes
-        try {
-            mCamera.stopPreview();
-        } catch (Exception e){
-          // ignore: tried to stop a non-existent preview
-        }
-
-        // set preview size and make any resize, rotate or
-        // reformatting changes here
-
-        // start preview with new settings
-        try {
-            mCamera.setPreviewDisplay(mHolder);
-            mCamera.startPreview();
-
-        } catch (Exception e){
-            Log.d(TAG, "Error starting camera preview: " + e.getMessage());
-        }*/
+    	//preview CANT change, so no need for this
     }
     
-    
-    
-    
-    
+    //get the optimal preview size, if available
     private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
         final double ASPECT_TOLERANCE = 0.1;
         double targetRatio = (double) w / h;
@@ -178,14 +144,5 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
         return optimalSize;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
 }

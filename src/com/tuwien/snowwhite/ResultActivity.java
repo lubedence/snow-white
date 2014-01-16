@@ -26,54 +26,61 @@ import android.widget.Toast;
 
 public class ResultActivity extends Activity {
 	
-	private String imgPath="";
-	private int[] facialData;
+	private String imgPath="";		//image path of the processed image
+	private int[] facialData;		//facial features. facialData[0|2|4|...] => x, facialData[1|3|5|...] => y 
 	
-	private FacialFeatures ff;
-	private float result = 0.0f;
+	private FacialFeatures ff;		//beauty calculation
+	private float result = 0.0f;	//result beauty-value 
 	
-	private LinearLayout contentContainer = null;
-	private LinearLayout contentContainer_cel = null;
+	private LinearLayout contentContainer_details = null; 	//detail-list layout-container
+	private LinearLayout contentContainer_cel = null;		//celebrity-list layout-container
 	
-	private ImageButton button_cel;
-	private ImageButton button_details;
+	private ImageButton button_cel;			//button to show celebrity data
+	private ImageButton button_details;		//button to show details about result
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_result);
 		
+		//get data of previous activity (FacialFeatureActivity)
 		Intent intent = getIntent();
 		imgPath = intent.getStringExtra(FacialFeatureActivity.IMAGEPATH);
 		facialData = intent.getIntArrayExtra(FacialFeatureActivity.FEATUREARRAY);
 		
+		//beauty calculation
 		try {
 			ff = new FacialFeatures(facialData,this);
 		} catch (DataFormatException e) {
 			Toast.makeText(ResultActivity.this, "Error parsing facial features", Toast.LENGTH_LONG).show();
-			e.printStackTrace();
 			finish();
 		}
 		
+		//button for detail view, button for celebrity view is disabled
 		button_cel = (ImageButton) findViewById(R.id.button_celebrities);
 		button_details = (ImageButton) findViewById(R.id.button_details);
 		button_details.setEnabled(false);
 		
+		//initialize both views
 		startDetails();
 		startCelebrities();
 	}
 	
-	
-	private void startDetails(){
+//initialize the detail view
+private void startDetails(){
 
-		contentContainer =  ((LinearLayout)findViewById(R.id.result_content));
-		contentContainer.setVisibility(View.VISIBLE);
+		contentContainer_details =  ((LinearLayout)findViewById(R.id.result_content));
+		contentContainer_details.setVisibility(View.VISIBLE);
 		
+		//title row: GOLDEN RATIO ERRORS-------------------------------------------------------
 		addDetailRow(getString(R.string.resultlist_gRatio_error), 5);
 		
+		//get golden ratio errors and description
 		float[] diff = ff.featureRatios();
 		String[] txt = ff.featureRatiosText();
 		
+		
+		//calculate best(green) and worst(red) error values and show each error in a row with a short description
 		int count=diff.length;
 		float total = 0f;
 		float max = 0.0f;
@@ -88,23 +95,23 @@ public class ResultActivity extends Activity {
 			total+=tmp;
 		}
 		float mean = total/count;
-		//red green for: min - green
 		float green = min + (mean-min)/3;
-		//green red for: red - max
 		float red = mean + (max - mean)/3;
 		for (int i=0; i<diff.length; i++){
 			float tmp = diff[i];
 			if(tmp<green)
-				addDetailRow(txt[i],tmp,Color.GREEN);
+				addDetailRow(txt[i],tmp,Color.GREEN);	//green: small error value
 			else if(tmp>red)
-				addDetailRow(txt[i],tmp,Color.RED);
+				addDetailRow(txt[i],tmp,Color.RED);		//red: big error value	
 			else
-				addDetailRow(txt[i],tmp,Color.GRAY);
+				addDetailRow(txt[i],tmp,Color.GRAY);	//gray: normal error value
 		}
 		
 		
+		//title row: SYMMETRY ERROR-----------------------------------------------------------
 		addDetailRow(getString(R.string.resultlist_fSymmetry_error), 15);
 		
+		//calculate best(green) and worst(red) error values and show each error in a row with a short description
 		diff = ff.checkSymmetry();
 		txt = ff.symmetryText();
 		max = 0.0f;
@@ -120,24 +127,24 @@ public class ResultActivity extends Activity {
 			tmpTotal+=tmp;
 		}
 		mean = tmpTotal/diff.length;
-		//red green for: min - green
 		green = min + (mean-min)/3;
-		//green red for: red - max
 		red = mean + (max - mean)/3;
 		for (int i=0; i<diff.length; i++){
 			float tmp = diff[i];
 			if(tmp<green)
-				addDetailRow(txt[i],tmp,Color.GREEN);
+				addDetailRow(txt[i],tmp,Color.GREEN);	//green: small error value
 			else if(tmp>red)
-				addDetailRow(txt[i],tmp,Color.RED);
+				addDetailRow(txt[i],tmp,Color.RED);		//red: big error value	
 			else
-				addDetailRow(txt[i],tmp,Color.GRAY);
+				addDetailRow(txt[i],tmp,Color.GRAY);	//gray: normal error value
 		}
-				
+		
+		//total score
 		total = total/(diff.length+count);
 		total = 100-total;
 		result = (float)Math.round(total*10) / 10.0f;
 		
+		//display total score with a smiley, expressing the scored beauty category
 		TextView title = (TextView)findViewById(R.id.result_title);
 		try{
 			String[] arr_smiley = this.getResources().getStringArray(R.array.smiley_categories);
@@ -153,6 +160,9 @@ public class ResultActivity extends Activity {
 		title.setText(result+"%");
 	}
 	
+	
+	//adds a row for the detail view
+	//a row consists of a description and a error value
 	private void addDetailRow(String desc, float score, int color){
 		
 		score = (float)Math.round(score*10) / 10.0f;
@@ -179,11 +189,12 @@ public class ResultActivity extends Activity {
 		tv2.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
 		rl.addView(tv2);
 		
-		contentContainer.addView(rl);
-		contentContainer.addView(divider());
+		contentContainer_details.addView(rl);
+		contentContainer_details.addView(divider());
 	}
 	
-	
+
+//adds a divider (used between two rows)
 private View divider(){
 	View v = new View(this);
 	int lineHeight = (int)(this.getResources().getDisplayMetrics().density);
@@ -192,7 +203,9 @@ private View divider(){
 	
 	return v;
 }
-	
+
+//adds a row header for the detail view
+//a row header consists of a title
 private void addDetailRow(String desc, int paddingTop){
 		
 		int padding = (int)(5 * this.getResources().getDisplayMetrics().density);
@@ -204,20 +217,22 @@ private void addDetailRow(String desc, int paddingTop){
 		tv.setPadding(padding, paddingTop, padding, padding);
 		tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,25);
 
-		contentContainer.addView(tv);
+		contentContainer_details.addView(tv);
 	}
 	
-
+//initialize the celebrity view
 private void startCelebrities(){
 	contentContainer_cel =  ((LinearLayout)findViewById(R.id.result_content_cel));
 	
+	//retrieve celebrity data
 	ICelebrityData celData = new CelebrityDataMock(this);
 	for (ICelebrity  c : celData.getAllCelebrities())
-		addCelRow(c.getName(),c.getScore(),c.getPicture());
+		addCelRow(c.getName(),c.getScore(),c.getPicture()); //adds a celebrity(picture, name and beauty value) to the layout
 	
 }
 
-
+//adds a row for the celebrity view
+//a row consists of one celebrity(picture, name and beauty value)
 private void addCelRow(String name, float score, Drawable picture){
 	score = (float)Math.round(score*10) / 10.0f;
 	
@@ -257,29 +272,31 @@ private void addCelRow(String name, float score, Drawable picture){
 }
 
 
-
-	
+	//back to the previews activity (ResultActivity)
 	public void back(View view){
 		  finish();
 	  }
 	
+	//go back to the main screen (menu)
 	public void goHome(View view){
 		Intent intent = new Intent(this, StartActivity.class);
 		startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 	}
 	
+	//change to celebrity view
 	public void goCelebrities(View view){
 		button_cel.setEnabled(false);
 		button_details.setEnabled(true);
-		contentContainer.setVisibility(View.GONE);
+		contentContainer_details.setVisibility(View.GONE);
 		contentContainer_cel.setVisibility(View.VISIBLE);
 		}
 	
+	//change to detail view
 	public void goDetails(View view){
 		button_cel.setEnabled(true);
 		button_details.setEnabled(false);
 		contentContainer_cel.setVisibility(View.GONE);
-		contentContainer.setVisibility(View.VISIBLE);
+		contentContainer_details.setVisibility(View.VISIBLE);
 		}
 
 }
