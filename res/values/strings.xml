@@ -30,10 +30,17 @@
     <string name="settings_size_value">image_size</string>
     <string name="settings_featureVis_id">image_featureVis_id</string>
     <string name="settings_info_title">Info</string>
+    <string name="settings_info">Developed by Lukas Furlan, supervised by Ao.Univ.Prof. Mag. Dr. Horst Eidenberger.\n\nUsed libraries: STASM 4.1 and OpenCV\n\nTU-Vienna, 2014</string>
     <string name="settings_featureVis_title">Feature Visualization</string>
     <string name="settings_featureVis_desc">Select how to visualize the facial features.</string>
     
     <string name="title_help">Help me!</string>
+    <string name="help_title_1">1. What is this App for?</string>
+    <string name="help_1">To begin with the App needs a photo of a face. The App detects the face and the facial features automatically and calculates a beauty score. The score relies on the golden ratio, as well as the symmetry of the facial features. A face is notably beautifull, if the face matches the optimal proportions of the golden ratio (1: 1,618) and is symmetrical.</string>
+    <string name="help_title_2">2. Correct way to take a photo</string>
+    <string name="help_2">The face needs to be recorded frontal without any tilt. The person should keep a neutral face expression - do not frown, do not smile. Just that way the App works correct and reveals something about the beauty of the face.</string>
+    <string name="help_title_3">3. The App crashes!</string>
+    <string name="help_3">Most likely the App needs more processing power than your device offers. Under Settings you have the possibility to reduce the size of the images.</string>
     
     <string name="processing">Processing &#8230;</string>
     <string name="stasm_error_loading">Cannot load image!</string>

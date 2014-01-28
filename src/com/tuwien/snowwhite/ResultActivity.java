@@ -47,6 +47,8 @@ public class ResultActivity extends Activity {
 	
 	private ImageButton button_cel;			//button to show celebrity data
 	private ImageButton button_details;		//button to show details about result
+	
+	private boolean firstCelRow;			//first shown Celebrity
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +71,9 @@ public class ResultActivity extends Activity {
 		//button for detail view, button for celebrity view is disabled
 		button_cel = (ImageButton) findViewById(R.id.button_celebrities);
 		button_details = (ImageButton) findViewById(R.id.button_details);
-		button_details.setEnabled(false);
+		button_cel.setEnabled(false);
+		
+		firstCelRow = true;
 		
 		//initialize both views
 		startDetails();
@@ -80,8 +84,7 @@ public class ResultActivity extends Activity {
 private void startDetails(){
 
 		contentContainer_details =  ((LinearLayout)findViewById(R.id.result_content));
-		contentContainer_details.setVisibility(View.VISIBLE);
-		
+
 		//title row: GOLDEN RATIO ERRORS-------------------------------------------------------
 		addDetailRow(getString(R.string.resultlist_gRatio_error), 5);
 		
@@ -127,13 +130,14 @@ private void startDetails(){
 		max = 0.0f;
 		min = 100.0f;
 		float tmpTotal = 0;
+		float total2 = 0.0f;
 		for (int i=0; i<diff.length; i++){
 			float tmp = diff[i];
 			if(tmp>max)
 				max = tmp;
 			if(tmp<min)
 				min = tmp;
-			total+=tmp;
+			total2+=tmp;
 			tmpTotal+=tmp;
 		}
 		mean = tmpTotal/diff.length;
@@ -149,8 +153,8 @@ private void startDetails(){
 				addDetailRow(txt[i],tmp,Color.GRAY);	//gray: normal error value
 		}
 		
-		//total score
-		total = total/(diff.length+count);
+		//total score (golden ratio weighted 2/3, symmetry weighted 1/3)
+		total = (total+total+total2)/(diff.length+count+count);
 		total = 100-total;
 		result = (float)Math.round(total*10) / 10.0f;
 		
@@ -233,12 +237,14 @@ private void addDetailRow(String desc, int paddingTop){
 //initialize the celebrity view
 private void startCelebrities(){
 	contentContainer_cel =  ((LinearLayout)findViewById(R.id.result_content_cel));
+	contentContainer_cel.setVisibility(View.VISIBLE);
 	
 	//retrieve celebrity data
 	ICelebrityData celData = new CelebrityDataMock(this);
-	for (ICelebrity  c : celData.getAllCelebrities())
+	for (ICelebrity  c : celData.getAllCelebritiesDescOrder())
 		addCelRow(c.getName(),c.getScore(),c.getPicture()); //adds a celebrity(picture, name and beauty value) to the layout
 	
+	celData = null;
 }
 
 //adds a row for the celebrity view
@@ -247,6 +253,10 @@ private void addCelRow(String name, float score, Drawable picture){
 	score = (float)Math.round(score*10) / 10.0f;
 	
 	RelativeLayout rl = new RelativeLayout(this);
+	if(firstCelRow){
+		rl.setBackgroundColor(Color.parseColor("#fff291"));
+		firstCelRow = false;
+	}
 	rl.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT));
 	int paddingDp = (int)(5 * this.getResources().getDisplayMetrics().density);
 	rl.setPadding(2*paddingDp, paddingDp, 2*paddingDp, paddingDp);

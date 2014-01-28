@@ -63,21 +63,19 @@
         	android:layout_margin="20dp">
             
 		        <TextView
-		            android:id="@+id/setting_ff_title"
+		            android:id="@+id/help_title_1"
 			        android:layout_width="fill_parent"
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
-			        android:text="Some title"
+			        android:text="@string/help_title_1"
 			        android:textSize="20sp"/>
 		        
 		        <TextView
-		            android:id="@+id/setting_ff_desc"
-			        android:layout_width="wrap_content"
+			        android:layout_width="fill_parent"
 			        android:layout_height="wrap_content"
-			        android:text="This text will help you to use this awesome app. This text will help you to use this awesome app. This text will help you to use this awesome app."
-			        android:layout_below="@id/setting_ff_title"
-		        	android:layout_alignParentLeft="true"
-		       		android:layout_toLeftOf="@+id/setting_ff_check"/>
+			        android:text="@string/help_1"
+			        android:layout_below="@+id/help_title_1"
+		        	android:layout_alignParentLeft="true"/>
 		        
         </RelativeLayout>
                 
@@ -87,37 +85,25 @@
 		    android:background="@android:color/darker_gray"/>
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-                <RelativeLayout 
+        <RelativeLayout 
          	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
         	android:layout_margin="20dp">
             
 		        <TextView
-		            android:id="@+id/setting_ff_title"
+		            android:id="@+id/help_title_2"
 			        android:layout_width="fill_parent"
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
-			        android:text="Some title"
+			        android:text="@string/help_title_2"
 			        android:textSize="20sp"/>
 		        
 		        <TextView
-		            android:id="@+id/setting_ff_desc"
-			        android:layout_width="wrap_content"
+			        android:layout_width="fill_parent"
 			        android:layout_height="wrap_content"
-			        android:text="This text will help you to use this awesome app. This text will help you to use this awesome app. This text will help you to use this awesome app."
-			        android:layout_below="@id/setting_ff_title"
-		        	android:layout_alignParentLeft="true"
-		       		android:layout_toLeftOf="@+id/setting_ff_check"/>
+			        android:text="@string/help_2"
+			        android:layout_below="@+id/help_title_2"
+		        	android:layout_alignParentLeft="true"/>
 		        
         </RelativeLayout>
                 
@@ -127,27 +113,25 @@
 		    android:background="@android:color/darker_gray"/>
         
         
-                <RelativeLayout 
+        <RelativeLayout 
          	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
         	android:layout_margin="20dp">
             
 		        <TextView
-		            android:id="@+id/setting_ff_title"
+		            android:id="@+id/help_title_3"
 			        android:layout_width="fill_parent"
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
-			        android:text="Some title"
+			        android:text="@string/help_title_3"
 			        android:textSize="20sp"/>
 		        
 		        <TextView
-		            android:id="@+id/setting_ff_desc"
-			        android:layout_width="wrap_content"
+			        android:layout_width="fill_parent"
 			        android:layout_height="wrap_content"
-			        android:text="This text will help you to use this awesome app. This text will help you to use this awesome app. This text will help you to use this awesome app."
-			        android:layout_below="@id/setting_ff_title"
-		        	android:layout_alignParentLeft="true"
-		       		android:layout_toLeftOf="@+id/setting_ff_check"/>
+			        android:text="@string/help_3"
+			        android:layout_below="@+id/help_title_3"
+		        	android:layout_alignParentLeft="true"/>
 		        
         </RelativeLayout>
                 
@@ -157,152 +141,12 @@
 		    android:background="@android:color/darker_gray"/>
         
         
-                <RelativeLayout 
-         	android:layout_width="fill_parent"
-        	android:layout_height="wrap_content"
-        	android:layout_margin="20dp">
-            
-		        <TextView
-		            android:id="@+id/setting_ff_title"
-			        android:layout_width="fill_parent"
-			        android:layout_height="wrap_content"
-			        android:layout_alignParentTop="true"
-			        android:text="Some title"
-			        android:textSize="20sp"/>
-		        
-		        <TextView
-		            android:id="@+id/setting_ff_desc"
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-			        android:text="This text will help you to use this awesome app. This text will help you to use this awesome app. This text will help you to use this awesome app."
-			        android:layout_below="@id/setting_ff_title"
-		        	android:layout_alignParentLeft="true"
-		       		android:layout_toLeftOf="@+id/setting_ff_check"/>
-		        
-        </RelativeLayout>
+        
+        
+
+        
+        
                 
-        <View
-		    android:layout_width="fill_parent"
-		    android:layout_height="1dp"
-		    android:background="@android:color/darker_gray"/>
-        
-        
-                <RelativeLayout 
-         	android:layout_width="fill_parent"
-        	android:layout_height="wrap_content"
-        	android:layout_margin="20dp">
-            
-		        <TextView
-		            android:id="@+id/setting_ff_title"
-			        android:layout_width="fill_parent"
-			        android:layout_height="wrap_content"
-			        android:layout_alignParentTop="true"
-			        android:text="Some title"
-			        android:textSize="20sp"/>
-		        
-		        <TextView
-		            android:id="@+id/setting_ff_desc"
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-			        android:text="This text will help you to use this awesome app. This text will help you to use this awesome app. This text will help you to use this awesome app."
-			        android:layout_below="@id/setting_ff_title"
-		        	android:layout_alignParentLeft="true"
-		       		android:layout_toLeftOf="@+id/setting_ff_check"/>
-		        
-        </RelativeLayout>
-                
-        <View
-		    android:layout_width="fill_parent"
-		    android:layout_height="1dp"
-		    android:background="@android:color/darker_gray"/>
-        
-                <RelativeLayout 
-         	android:layout_width="fill_parent"
-        	android:layout_height="wrap_content"
-        	android:layout_margin="20dp">
-            
-		        <TextView
-		            android:id="@+id/setting_ff_title"
-			        android:layout_width="fill_parent"
-			        android:layout_height="wrap_content"
-			        android:layout_alignParentTop="true"
-			        android:text="Some title"
-			        android:textSize="20sp"/>
-		        
-		        <TextView
-		            android:id="@+id/setting_ff_desc"
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-			        android:text="This text will help you to use this awesome app. This text will help you to use this awesome app. This text will help you to use this awesome app."
-			        android:layout_below="@id/setting_ff_title"
-		        	android:layout_alignParentLeft="true"
-		       		android:layout_toLeftOf="@+id/setting_ff_check"/>
-		        
-        </RelativeLayout>
-                
-        <View
-		    android:layout_width="fill_parent"
-		    android:layout_height="1dp"
-		    android:background="@android:color/darker_gray"/>
-        
-                <RelativeLayout 
-         	android:layout_width="fill_parent"
-        	android:layout_height="wrap_content"
-        	android:layout_margin="20dp">
-            
-		        <TextView
-		            android:id="@+id/setting_ff_title"
-			        android:layout_width="fill_parent"
-			        android:layout_height="wrap_content"
-			        android:layout_alignParentTop="true"
-			        android:text="Some title"
-			        android:textSize="20sp"/>
-		        
-		        <TextView
-		            android:id="@+id/setting_ff_desc"
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-			        android:text="This text will help you to use this awesome app. This text will help you to use this awesome app. This text will help you to use this awesome app."
-			        android:layout_below="@id/setting_ff_title"
-		        	android:layout_alignParentLeft="true"
-		       		android:layout_toLeftOf="@+id/setting_ff_check"/>
-		        
-        </RelativeLayout>
-                
-        <View
-		    android:layout_width="fill_parent"
-		    android:layout_height="1dp"
-		    android:background="@android:color/darker_gray"/>
-        
-                <RelativeLayout 
-         	android:layout_width="fill_parent"
-        	android:layout_height="wrap_content"
-        	android:layout_margin="20dp">
-            
-		        <TextView
-		            android:id="@+id/setting_ff_title"
-			        android:layout_width="fill_parent"
-			        android:layout_height="wrap_content"
-			        android:layout_alignParentTop="true"
-			        android:text="Some title"
-			        android:textSize="20sp"/>
-		        
-		        <TextView
-		            android:id="@+id/setting_ff_desc"
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-			        android:text="This text will help you to use this awesome app. This text will help you to use this awesome app. This text will help you to use this awesome app."
-			        android:layout_below="@id/setting_ff_title"
-		        	android:layout_alignParentLeft="true"
-		       		android:layout_toLeftOf="@+id/setting_ff_check"/>
-		        
-        </RelativeLayout>
-                
-        <View
-		    android:layout_width="fill_parent"
-		    android:layout_height="1dp"
-		    android:background="@android:color/darker_gray"/>
-        
         
         
         

@@ -27,10 +27,17 @@
     <string name="settings_size_title">Bildgröße</string>
     <string name="settings_size_desc">Wähle die passende Größe für dein Gerät. Warnung: Große Bilder erfordern mehr Rechenleistung und die App könnte abstürzen.</string>
     <string name="settings_info_title">Info</string>
+    <string name="settings_info">Entwickelt von Lukas Furlan unter der Aufsicht von Ao.Univ.Prof. Mag. Dr. Horst Eidenberger.\n\nBenutzte Libraries: STASM 4.1 und OpenCV\n\nTU-Wien, 2014</string>
     <string name="settings_featureVis_title">Gesichtsmerkmale</string>
     <string name="settings_featureVis_desc">Entscheide wie die Gesichtsmerkmale angezeigt werden sollen.</string>
     
     <string name="title_help">Hilf mir!</string>
+    <string name="help_title_1">1. Was macht die App?</string>
+    <string name="help_1">Die App benötigt zunächst das Foto eines Gesichtes. Das Gesicht, sowie dessen Merkmale werden anschließend automatisch erkannt. Aus diesen Daten wird ein Wert berechnet, welcher die "Schönheit" des Gesichtes wiederspiegelt. Der Wert beruht auf der Genauigkeit der goldenen Schnitte, sowie der Symmetrie in Gesichtsmerkmalen. Ein Gesicht ist also besonders schön, wenn es den optimalen Verhältnissen des goldenen Schnittes von 1: 1,618 entspricht.</string>
+    <string name="help_title_2">2. Foto korrekt aufnehmen</string>
+    <string name="help_2">Das Gesicht muss frontal und ohne Neigung aufgenommen werden. Die Person muss einen neutralen Gesichtsausdruck aufweisen, also nicht etwa Lachen oder das Gesicht verziehen. Erst dann kann der berechnete Wert etwas über das Gesicht aussagen.</string>
+    <string name="help_title_3">3. Die App stürzt ab!</string>
+    <string name="help_3">Wahrscheinlich benötigt die App mehr Leistung, als dein Gerät zu bieten hat. In den Einstellungen lässt sich die Größe des aufgenommenen Bildes eventuell verkleinern.</string>
     
     <string name="processing">Berechne &#8230;</string>
     <string name="stasm_error_loading">Bild kann nicht geöffnet werden!</string>

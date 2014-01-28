@@ -17,10 +17,10 @@
     <!-- .................................................. -->
     
     <string-array name="smiley_categories">
-        <item>0</item><!--  0  - 85.99 Smiley :-( -->
-        <item>86</item><!-- 86 - 88.99 Smiley :-| -->
-        <item>89</item><!-- 89 - 91.99 Smiley :-) -->
-        <item>92</item><!-- 92 - 100   Smiley :-D -->
+        <item>0</item><!--  0  - 56.99 Smiley :-( -->
+        <item>64</item><!-- 86 - 88.99 Smiley :-| -->
+        <item>71</item><!-- 89 - 91.99 Smiley :-) -->
+        <item>78</item><!-- 92 - 100   Smiley :-D -->
     </string-array>
     
     <string-array name="setting_featureVis_desc">

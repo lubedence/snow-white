@@ -14,8 +14,9 @@ import java.util.ArrayList;
 
 public interface ICelebrityData {
 	
-	public ArrayList<ICelebrity> getAllCelebrities();
-	public ArrayList<ICelebrity> getAllFemaleCelebrities();
-	public ArrayList<ICelebrity> getAllMaleCelebrities();
-	
+	public ArrayList<ICelebrity> getAllCelebritiesDescOrder();
+	public ArrayList<ICelebrity> getAllFemaleCelebritiesDescOrder();
+	public ArrayList<ICelebrity> getAllMaleCelebritiesDescOrder();
+
 }
+

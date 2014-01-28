@@ -54,6 +54,7 @@
 		    android:background="#ffffff"
 		    android:paddingTop="10dp"
 		    android:paddingBottom="10dp"
+		    android:visibility="gone"
 		    >
 		    
 	        </LinearLayout>
@@ -66,7 +67,6 @@
 		    android:background="#ffffff"
 		    android:paddingTop="10dp"
 		    android:paddingBottom="10dp"
-		    android:visibility="gone"
 		    >
 		    
 	        </LinearLayout>

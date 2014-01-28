@@ -143,12 +143,19 @@
 			android:paddingTop="20dp">
             
 		        <TextView
-		            android:id="@+id/setting_info"
+		            android:id="@+id/setting_info_title"
 			        android:layout_width="fill_parent"
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
 			        android:text="@string/settings_info_title"
 			        android:textSize="20sp"/>
+		        
+		        <TextView
+		            android:id="@+id/setting_info"
+			        android:layout_width="fill_parent"
+			        android:layout_height="wrap_content"
+			        android:text="@string/settings_info"
+			        android:layout_below="@id/setting_info_title"/>
 
         </RelativeLayout>
         

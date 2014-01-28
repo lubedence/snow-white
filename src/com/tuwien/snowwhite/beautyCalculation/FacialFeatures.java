@@ -36,7 +36,10 @@ public class FacialFeatures {
 	
 	private final int FEATURECOUNT = 77;
 	private FeaturePoints[] points = new FeaturePoints[FEATURECOUNT];
+	
 	public static float GOLDENRATIO = 1.618f;
+	private static float MAX = 0.98f;
+	private static float MIN = 0.3f;
 	
 	private Context context = null;
 	
@@ -90,10 +93,11 @@ public class FacialFeatures {
 		int nose_width = noseWidth();//should be 1.00
 		int eyes_outer_dist = eyesOuterDistance();//should be phi^2
 		int face_width = faceWidth();//should be phi^3
-		float a = oneToOneRatio(nose_width*GOLDENRATIO*GOLDENRATIO, eyes_outer_dist);
-		float b = oneToOneRatio(nose_width*GOLDENRATIO*GOLDENRATIO*GOLDENRATIO, face_width);
-		float c = oneToOneRatio(eyes_outer_dist*GOLDENRATIO, face_width);
-		deviation[3] = (a+b+c)/3;
+		
+		float a = goldenRatio2(nose_width, eyes_outer_dist,2);
+		float b = goldenRatio2(nose_width, face_width,3);
+		
+		deviation[3] = (a+b)/2;
 		ratioText[3] = context.getString(R.string.nose_eye_faceWidth);
 		
 		//mouth width - space between eyes
@@ -131,22 +135,45 @@ public class FacialFeatures {
 		else				ratio = distBC/distAB;
 		
 		float diff = Math.abs(ratio-GOLDENRATIO);
-		float percent = diff*100/GOLDENRATIO;
+		Log.d("CHECK", diff+"");
+		Log.d("CHECK", ((float)Math.exp(-diff))+"");
+		diff = (float) ((Math.exp(-diff) - MIN)/(MAX-MIN));
 		
-		if(percent>100)	return 100;
-		else			return percent;
+		if(Float.compare(diff, 1.0f) >=0)		diff = 1.0f;
+		else if(Float.compare(diff, 0.0f) <=0)	diff = 0.0f;
+		
+		float percent = (1.0f - diff)*100;
+		
+		Log.d("CHECK", percent+"");
+		
+
+		return percent;
 	}
 	
-	//return: decviation of distA to distB in percentage
-	private float oneToOneRatio(float distA, float distB){
-		float percent = 0;
-		if(distA<distB)		percent = Math.abs((distA/distB)-1)*100;
-		else				percent = Math.abs((distB/distA)-1)*100;
+	//distAB+distBC= distance A to C
+	//B should be the (golden ratio)^pow of the distance A to C
+	//return: deviation in percentage
+	private float goldenRatio2(float distAB, float distBC,int pow){
+		float ratio = 0;
 		
-		if(percent>100) return 100;
-		else return percent;
+		if(distAB>distBC)	ratio = distAB/distBC;
+		else				ratio = distBC/distAB;
+		
+		float diff = (float) Math.abs(ratio-Math.pow(GOLDENRATIO,pow));
+		diff = (float) ((Math.exp(-diff) - 0.01)/(MAX-0.01));
+		
+		if(Float.compare(diff, 1.0f) >=0)		diff = 1.0f;
+		else if(Float.compare(diff, 0.0f) <=0)	diff = 0.0f;
+		
+		float percent = (1.0f - diff)*100;
+		
+		Log.d("CHECK_2", percent+"");
+		
+
+		return percent;
 	}
 	
+		
 	//symmetry of mouth, nose and eyes
 	//symmetry line goes from FACE_TOP to FACE_BOTTOM
 	public float[] checkSymmetry(){
@@ -208,11 +235,15 @@ public class FacialFeatures {
 		deltaX = Math.abs(half[0] - start[0]);
 		deltaY = Math.abs(half[1] - start[1]);
 		float lengthHalf = (float)Math.sqrt((double)(deltaX*deltaX+deltaY*deltaY));
-		float diff = lengthHalf / (length/2);
-		if(diff>1)	diff-=1;
-		else		diff = 1-diff;
 		
-		return diff*100;
+		float diff = Math.abs((lengthHalf - (length/2)) / (length/2));
+		Log.d("SYM", diff+"");
+		diff = (float) ((Math.exp(-diff) - 0.8)/(0.9999-0.8));	
+		if(Float.compare(diff, 1.0f) >=0)		diff = 1.0f;
+		else if(Float.compare(diff, 0.0f) <=0)	diff = 0.0f;
+		float percent = (1.0f - diff)*100;
+		
+		return percent;
 	}
 	
 	//array-length of start and end == [2] with x on [0] and y on [1]
