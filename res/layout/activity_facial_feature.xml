@@ -12,9 +12,14 @@
 <RelativeLayout 
     android:layout_width="fill_parent" 
     android:layout_height="fill_parent" 
-    android:background="#96bec8"
     xmlns:android="http://schemas.android.com/apk/res/android" >   
         
+    <LinearLayout
+		    android:orientation="horizontal"
+		    android:layout_width="fill_parent"
+		    android:layout_height="match_parent"
+		    android:background="@color/white"
+		    />
     
         <com.tuwien.snowwhite.SampleView 
         android:id="@+id/sv" 
@@ -29,6 +34,7 @@
 		    android:layout_width="fill_parent"
 		    android:layout_height="wrap_content"
 		    android:layout_alignParentBottom="true"
+		    android:background="#96bec8"
 		    >
 		    
             	<Button

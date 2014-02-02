@@ -32,6 +32,8 @@ public class SampleView extends ImageView {
 	public SampleView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 
+		this.setAlpha(0.8f);
+		
 		//set color (red)
         rPaint = new Paint();
         rPaint.setColor(Color.RED);
