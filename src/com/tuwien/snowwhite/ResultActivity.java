@@ -63,6 +63,7 @@ public class ResultActivity extends Activity {
 		//beauty calculation
 		try {
 			ff = new FacialFeatures(facialData,this);
+			//ff.Faulheit();
 		} catch (DataFormatException e) {
 			Toast.makeText(ResultActivity.this, "Error parsing facial features", Toast.LENGTH_LONG).show();
 			finish();
@@ -241,8 +242,12 @@ private void startCelebrities(){
 	
 	//retrieve celebrity data
 	ICelebrityData celData = new CelebrityDataMock(this);
-	for (ICelebrity  c : celData.getAllCelebritiesDescOrder())
+	for (ICelebrity  c : celData.getCelebritiesDescOrder(ff.getFeaturePoints(), 5))
+		addCelRow(c.getName(),c.getScore(),c.getPicture()); //adds a celebrity(picture, name and similarity percentage) to the layout
+	
+	/*for (ICelebrity  c : celData.getAllCelebritiesDescOrder())
 		addCelRow(c.getName(),c.getScore(),c.getPicture()); //adds a celebrity(picture, name and beauty value) to the layout
+		*/
 	
 	celData = null;
 }
@@ -267,6 +272,7 @@ private void addCelRow(String name, float score, Drawable picture){
 	iv.setLayoutParams(params);
 	iv.setScaleType(ScaleType.CENTER_CROP);
 	iv.setImageDrawable(picture);
+	picture=null;
 	rl.addView(iv);
 	
 	TextView tv1 = new TextView(this);

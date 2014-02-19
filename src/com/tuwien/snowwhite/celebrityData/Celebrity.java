@@ -10,6 +10,8 @@
  ******************************************************************************/
 package com.tuwien.snowwhite.celebrityData;
 
+import com.tuwien.snowwhite.beautyCalculation.FeaturePoints;
+
 import android.graphics.drawable.Drawable;
 
 public class Celebrity implements ICelebrity{
@@ -18,12 +20,14 @@ public class Celebrity implements ICelebrity{
 	private String sex;
 	private float score;
 	private Drawable picture;
+	private FeaturePoints[] points;
 	
-	public Celebrity(String name, String sex, float score, Drawable picture){
+	public Celebrity(String name, String sex, float score, Drawable picture, FeaturePoints[] points){
 		this.name = name;
 		this.sex = sex;
 		this.score = score;
 		this.picture = picture;
+		this.points = points;
 	}
 
 	@Override
@@ -39,6 +43,15 @@ public class Celebrity implements ICelebrity{
 	@Override
 	public float getScore() {
 		return score;
+	}
+	
+	public void setScore(float s){
+		score = s;
+	}
+	
+	@Override
+	public FeaturePoints[] getPoints() {
+		return points;
 	}
 
 	@Override

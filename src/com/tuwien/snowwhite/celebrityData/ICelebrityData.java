@@ -12,11 +12,15 @@ package com.tuwien.snowwhite.celebrityData;
 
 import java.util.ArrayList;
 
+import com.tuwien.snowwhite.beautyCalculation.FeaturePoints;
+
 public interface ICelebrityData {
 	
 	public ArrayList<ICelebrity> getAllCelebritiesDescOrder();
 	public ArrayList<ICelebrity> getAllFemaleCelebritiesDescOrder();
 	public ArrayList<ICelebrity> getAllMaleCelebritiesDescOrder();
+	
+	public  ArrayList<ICelebrity> getCelebritiesDescOrder(FeaturePoints[] points, int bestX);
 
 }
 

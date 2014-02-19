@@ -49,4 +49,7 @@
     
     <string name="image_not_saved">Image from gallery could not be processed.</string>
     
+    <string name="your_score">Your score</string>
+    <string name="similar_celebs">Similar looking celebs</string>
+    
 </resources>

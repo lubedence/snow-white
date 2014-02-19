@@ -19,22 +19,11 @@ import android.content.res.Resources;
 import android.util.Log;
 
 public class FacialFeatures {
-	
-	private class FeaturePoints{
-		public int x;
-		public int y;
-		
-		public FeaturePoints(int x, int y){
-			this.x = x;
-			this.y = y;
-		}
-		
-	}
-	
+
 	private String[] ratioText = null;
 	private String[] symmetryText = null;
 	
-	private final int FEATURECOUNT = 77;
+	public static final int FEATURECOUNT = 77;
 	private FeaturePoints[] points = new FeaturePoints[FEATURECOUNT];
 	
 	public static float GOLDENRATIO = 1.618f;
@@ -53,6 +42,18 @@ public class FacialFeatures {
 			points[i] = new FeaturePoints(p[2*i], p[2*i+1]);	
 	}
 	
+	public void Faulheit(){
+		String txt = "new FeaturePoints[]{";
+		
+		for(int i=0; i<points.length; i++){
+			txt+="new FeaturePoints("+points[i].x+","+points[i].y+")";
+			if(i!=points.length-1)
+				txt+=",";
+		}
+		txt+="};";
+		Log.d("POINTS", txt);
+	}
+	
 	
 	public String[] featureRatiosText(){
 		return ratioText;
@@ -62,6 +63,10 @@ public class FacialFeatures {
 		return symmetryText;
 	}
 	
+	
+	public FeaturePoints[] getFeaturePoints(){
+		return points;
+	}
 	
 	public float[] featureRatios(){
 		

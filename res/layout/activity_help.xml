@@ -68,6 +68,7 @@
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
 			        android:text="@string/help_title_1"
+			        android:paddingBottom="10dp"
 			        android:textSize="20sp"/>
 		        
 		        <TextView
@@ -96,6 +97,7 @@
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
 			        android:text="@string/help_title_2"
+			        android:paddingBottom="10dp"
 			        android:textSize="20sp"/>
 		        
 		        <TextView
@@ -124,6 +126,7 @@
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
 			        android:text="@string/help_title_3"
+			        android:paddingBottom="10dp"
 			        android:textSize="20sp"/>
 		        
 		        <TextView

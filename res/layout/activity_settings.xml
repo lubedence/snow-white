@@ -66,6 +66,7 @@
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
 			        android:text="@string/settings_size_title"
+			        android:paddingBottom="10dp"
 			        android:textSize="20sp"/>
 		        
 		        <TextView
@@ -75,7 +76,8 @@
 			        android:text="@string/settings_size_desc"
 			        android:layout_below="@id/setting_imgSize_title"
 		        	android:layout_alignParentLeft="true"
-		       		android:layout_toLeftOf="@+id/setting_imgSize_spinner"/>
+		       		android:layout_toLeftOf="@+id/setting_imgSize_spinner"
+		       		android:paddingRight="5dp"/>
 		        
 		        <Spinner
 				    android:id="@+id/setting_imgSize_spinner"
@@ -101,6 +103,7 @@
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
 			        android:text="@string/settings_featureVis_title"
+			        android:paddingBottom="10dp"
 			        android:textSize="20sp"/>
 		        
 		        <TextView
@@ -110,7 +113,8 @@
 			        android:text="@string/settings_featureVis_desc"
 			        android:layout_below="@id/setting_featureVis_title"
 		        	android:layout_alignParentLeft="true"
-		       		android:layout_toLeftOf="@+id/setting_featureVis_spinner"/>
+		       		android:layout_toLeftOf="@+id/setting_featureVis_spinner"
+		       		android:paddingRight="5dp"/>
 		        
 		        <Spinner
 				    android:id="@+id/setting_featureVis_spinner"
@@ -148,6 +152,7 @@
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
 			        android:text="@string/settings_info_title"
+			        android:paddingBottom="10dp"
 			        android:textSize="20sp"/>
 		        
 		        <TextView

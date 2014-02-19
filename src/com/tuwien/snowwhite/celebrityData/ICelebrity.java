@@ -10,6 +10,8 @@
  ******************************************************************************/
 package com.tuwien.snowwhite.celebrityData;
 
+import com.tuwien.snowwhite.beautyCalculation.FeaturePoints;
+
 import android.graphics.drawable.Drawable;
 
 public interface ICelebrity {
@@ -17,6 +19,14 @@ public interface ICelebrity {
 	public String getName();
 	public String getSex();
 	public float getScore();
+	public void setScore(float s);
 	public Drawable getPicture();
+	FeaturePoints[] getPoints();
 
 }
+
+/* Hier variable mit facial-features array hinzufügen. (Celeb erneut abfotografieren, falls maske + wertung ~stimmt, dann die arraywerte ablesen und 
+ * statisch speichern
+ * Dann bei result activity user array mit celeb. arrays vergleichen -> geeigneter algorithmus um top 5 eukl. distanzen zu finden
+ * Diese anschließend anzeigen
+ */

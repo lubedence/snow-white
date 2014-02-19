@@ -45,5 +45,8 @@
     <string name="stasm_error_finding">Gesichtserkennung fehlgeschlagen!</string>
     
     <string name="image_not_saved">Galerie-Bild kann nicht verarbeitet werden!</string>
+    
+    <string name="your_score">Dein Score</string>
+    <string name="similar_celebs">Deine ähnlichsten Promis</string>
 
 </resources>
