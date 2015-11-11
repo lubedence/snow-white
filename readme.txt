@@ -8,4 +8,3 @@
 
 
 20. Jan. 2014
-Lukas Furlan (furlan.lukas@gmail.com)
